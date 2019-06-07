@@ -3,7 +3,7 @@ package com.atossyntel.connection;
 import com.atossyntel.entities.User;
 import java.util.ArrayList;
 
-public class UserDAO implements JDBCInterface{
+public class UserDAO implements UserJDBCInterface{
 
 	@Override
 	public User getUser(String userId) {
