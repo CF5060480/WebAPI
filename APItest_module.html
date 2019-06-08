@@ -1,0 +1,51 @@
+<<!DOCTYPE html>
+  <html lang="en" dir="ltr">
+
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  </head>
+
+  <body>
+    <div>Placeholder Text</div>
+    <script>
+      /*
+      *INSTRUCTIONS FOR TESTING API:
+      *format the jsonVal like you see below, but with the fields that you take for your entity
+      *change the URL for each call to the ones you define in each controller (for example, createEmployee could be createUser, createStream, etc.)
+      *run the file after you deploy the web api, it should work.
+      *If it doesn't, message me on discord and I will try to figure out what is going on.
+      */
+      var jsonVal = '{"moduleId":"195", "moduleName":"jayModule", "categoryId":"FOUND01", "streamId":"BD456"}';
+	  //var jsonVal= '{"userId":"shengchun_liu@syntelincAAA.com", "password":"whaever", "isadmin":"Y"}';
+      var json = JSON.parse(jsonVal);
+      console.log("Json Object: " + json);
+      $.post("http://localhost:8084/WebAPI/createModule", json, function (data) {
+        console.log("module Created: " + data);
+        $.get("http://localhost:8084/WebAPI/getAllModules", function (data) {
+          console.log("List of all modules: " + data);
+          $.post("http://localhost:8084/WebAPI/getModule", json, function (data) {
+            console.log("Specific module: " + data);
+			
+            var jsonVal2 = '{"moduleId":"195", "moduleName":"jayKLMNOP", "categoryId":"FOUND01", "streamId":"BD456"}';		
+            var json2 = JSON.parse(jsonVal2);
+            $.post("http://localhost:8084/WebAPI/updateModule", json2, function (data) {
+              console.log("Module Updated: " + data);
+              $.post("http://localhost:8084/WebAPI/getModule", json, function (data) {
+                console.log("Specific module: " + data);
+                $.post("http://localhost:8084/WebAPI/deleteModule", json, function (data) {
+                  console.log("Module Deleted: " + data);
+                });
+              });
+            });
+          });
+        });
+      });
+
+
+
+    </script>
+  </body>
+
+  </html>
