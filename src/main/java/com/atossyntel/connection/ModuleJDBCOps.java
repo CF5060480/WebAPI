@@ -63,10 +63,6 @@ public class ModuleJDBCOps {
 
     public boolean updateModule(Module module) {
         try {
-            System.out.println("UPDATE modules SET(MODULE_NAME= '" + module.getModuleName()
-                    + "', CATEGORY_ID='" + module.getCategoryId()
-                    + "', STREAM_ID='" + module.getStreamId()
-                    + "') WHERE MODULE_ID = '" + module.getModuleId() + "'");
             st.executeQuery("UPDATE modules SET MODULE_NAME= '" + module.getModuleName()
                     + "', CATEGORY_ID='" + module.getCategoryId()
                     + "', STREAM_ID='" + module.getStreamId()
@@ -84,7 +80,6 @@ public class ModuleJDBCOps {
             ArrayList<Module> moduleList = new ArrayList<>();
             while (rs.next()) {
                 Module module = new Module(rs.getString("MODULE_ID"), rs.getString("MODULE_NAME"), rs.getString("CATEGORY_ID"),rs.getString("STREAM_ID"));
-                System.out.println("####"+module);
                 moduleList.add(module);
             }
             return moduleList;

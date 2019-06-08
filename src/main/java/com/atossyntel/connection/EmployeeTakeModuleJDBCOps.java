@@ -1,0 +1,105 @@
+package com.atossyntel.connection;
+
+import com.atossyntel.entities.Employee;
+import com.atossyntel.entities.EmployeeTakeModule;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+
+public class EmployeeTakeModuleJDBCOps {
+
+    private Connection con;
+    private Statement st;
+
+    public EmployeeTakeModuleJDBCOps() {
+        try {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+            con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "Student_Performance", "Student_Performance");
+            st = con.createStatement();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public EmployeeTakeModule getEmployeeTakeModule(String empId, String moduleId, String batchId, String scores) {
+        try {
+            ResultSet rs = st.executeQuery("SELECT * FROM employees_take_modules WHERE module_id= " + "'" + moduleId+"'"
+                                                                                +" AND employee_id= " + "'" + empId+"'"
+                                                                                +" AND batch_id= " + "'" + batchId+"'"
+                                                                                +" AND scores= " + "'" + scores
+                                                                                + "'");
+            EmployeeTakeModule empTakeMo;
+            while (rs.next()) {
+                empTakeMo = new EmployeeTakeModule(rs.getString("MODULE_ID"), rs.getString("EMPLOYEE_ID"), rs.getString("BATCH_ID"), rs.getString("SCORES"));
+                return empTakeMo;
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            return new EmployeeTakeModule();
+        }
+        return new EmployeeTakeModule();
+    }
+
+    public boolean addEmployeeTakeModule(EmployeeTakeModule empTakeMo) {
+        try {
+            st.executeQuery("INSERT INTO employees_take_modules VALUES('" 
+                    + empTakeMo.getMduleId() + "', '" 
+                    + empTakeMo.getEmployeeId() + "', '" 
+                    + empTakeMo.getBatchId() + "', '" 
+                    + empTakeMo.getScores() + "')");
+            return true;
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            return false;
+        }
+    }
+
+    public boolean deleteEmployeeTakeModule(String moduleId,String empId,String batchId) {
+        try {
+            st.executeQuery("DELETE FROM employees_take_modules WHERE "
+                    + "MODULE_ID='" + moduleId+"' AND "
+                    + "EMPLOYEE_ID='" + empId + "' AND "
+                    + "BATCH_ID='" + batchId
+                    + "'");
+            return true;
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            return false;
+        }
+    }
+
+    public boolean updateEmployeeTakeModule(EmployeeTakeModule empTakeMo) {
+        try {
+            st.executeQuery("UPDATE employees_take_modules SET "
+                    + "SCORES='" + empTakeMo.getScores()
+                    + "' , MODULE_ID = '" + empTakeMo.getMduleId()
+                    + "' , EMPLOYEE_ID = '" + empTakeMo.getEmployeeId()
+                    + "' , BATCH_ID = '" + empTakeMo.getBatchId()
+                    + "'");
+            return true;
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            return false;
+        }
+    }
+
+    public ArrayList<EmployeeTakeModule> getAllEmployeeTakeModules() {
+        try {
+            ResultSet rs = st.executeQuery("SELECT * FROM employees_take_modules");
+            ArrayList<EmployeeTakeModule> empTakeMoList = new ArrayList<>();
+            System.out.println(rs.toString());
+            while (rs.next()) {
+                EmployeeTakeModule empTakeMo = new EmployeeTakeModule(rs.getString("MODULE_ID"), 
+                        rs.getString("EMPLOYEE_ID"), rs.getString("BATCH_ID"), rs.getString("SCORES"));
+                empTakeMoList.add(empTakeMo);
+            }
+            return empTakeMoList;
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            return new ArrayList<>();
+        }
+    }
+}
