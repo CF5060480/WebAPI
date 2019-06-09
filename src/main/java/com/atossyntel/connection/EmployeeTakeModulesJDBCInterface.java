@@ -6,7 +6,7 @@ import java.util.ArrayList;
 /*treating employeeId, moduleId as primary key */
 public interface EmployeeTakeModulesJDBCInterface {
     // Note the primary key is the whole 4 attributes in the table 
-    public EmployeeTakeModule getEmployeeTakeModule(String moduleId,String empId,String batchId, String scores);
+    public ArrayList<EmployeeTakeModule> getEmployeeTakeModule(String batchId);
     public boolean deleteEmployeeTakeModule(String moduleId,String empId, String batchId);
     public boolean updateEmployeeTakeModule(EmployeeTakeModule empTakeMo);
     public ArrayList<EmployeeTakeModule> getAllEmployeeTakeModule();

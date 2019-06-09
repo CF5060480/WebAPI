@@ -24,23 +24,19 @@ public class EmployeeTakeModuleJDBCOps {
         }
     }
 
-    public EmployeeTakeModule getEmployeeTakeModule(String empId, String moduleId, String batchId, String scores) {
+    public ArrayList<EmployeeTakeModule> getEmployeeTakeModule(String batchId) {
         try {
-            ResultSet rs = st.executeQuery("SELECT * FROM employees_take_modules WHERE module_id= " + "'" + moduleId+"'"
-                                                                                +" AND employee_id= " + "'" + empId+"'"
-                                                                                +" AND batch_id= " + "'" + batchId+"'"
-                                                                                +" AND scores= " + "'" + scores
-                                                                                + "'");
-            EmployeeTakeModule empTakeMo;
+            ResultSet rs = st.executeQuery("SELECT * FROM employees_take_modules WHERE batch_id='" + batchId+ "'");
+            ArrayList<EmployeeTakeModule> empTakeMoList = new ArrayList<>();
             while (rs.next()) {
-                empTakeMo = new EmployeeTakeModule(rs.getString("MODULE_ID"), rs.getString("EMPLOYEE_ID"), rs.getString("BATCH_ID"), rs.getString("SCORES"));
-                return empTakeMo;
+                EmployeeTakeModule empTakeMo = new EmployeeTakeModule(rs.getString("MODULE_ID"), rs.getString("EMPLOYEE_ID"), rs.getString("BATCH_ID"), rs.getInt("SCORES"));
+                empTakeMoList.add(empTakeMo);
             }
+            return empTakeMoList;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return new EmployeeTakeModule();
+            return new ArrayList<>();
         }
-        return new EmployeeTakeModule();
     }
 
     public boolean addEmployeeTakeModule(EmployeeTakeModule empTakeMo) {
@@ -74,11 +70,9 @@ public class EmployeeTakeModuleJDBCOps {
     public boolean updateEmployeeTakeModule(EmployeeTakeModule empTakeMo) {
         try {
             st.executeQuery("UPDATE employees_take_modules SET "
-                    + "SCORES='" + empTakeMo.getScores()
-                    + "' , MODULE_ID = '" + empTakeMo.getMduleId()
-                    + "' , EMPLOYEE_ID = '" + empTakeMo.getEmployeeId()
-                    + "' , BATCH_ID = '" + empTakeMo.getBatchId()
-                    + "'");
+                    + "SCORES='" + empTakeMo.getScores() + "' WHERE MODULE_ID = '" + empTakeMo.getMduleId()
+                    + "' AND EMPLOYEE_ID = '" + empTakeMo.getEmployeeId()
+                    + "' AND BATCH_ID = '" + empTakeMo.getBatchId() + "'");
             return true;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
@@ -93,7 +87,7 @@ public class EmployeeTakeModuleJDBCOps {
             System.out.println(rs.toString());
             while (rs.next()) {
                 EmployeeTakeModule empTakeMo = new EmployeeTakeModule(rs.getString("MODULE_ID"), 
-                        rs.getString("EMPLOYEE_ID"), rs.getString("BATCH_ID"), rs.getString("SCORES"));
+                        rs.getString("EMPLOYEE_ID"), rs.getString("BATCH_ID"), rs.getInt("SCORES"));
                 empTakeMoList.add(empTakeMo);
             }
             return empTakeMoList;

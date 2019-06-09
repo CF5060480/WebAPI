@@ -6,15 +6,15 @@ import java.util.ArrayList;
 public class EmployeeTakeModulesDAO implements EmployeeTakeModulesJDBCInterface {
 
     @Override
-    public EmployeeTakeModule getEmployeeTakeModule(String moduleId, String empId, String batchId, String scores) {
+    public ArrayList<EmployeeTakeModule> getEmployeeTakeModule(String batchId) {
         EmployeeTakeModuleJDBCOps dbObj = new EmployeeTakeModuleJDBCOps();
         try {
-            EmployeeTakeModule temp = dbObj.getEmployeeTakeModule(empId, moduleId, batchId, scores);
+            ArrayList<EmployeeTakeModule> temp = dbObj.getEmployeeTakeModule(batchId);
             System.out.println("EmployeeTakeModule Retrieved: " + temp);
             return temp;
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return new EmployeeTakeModule();
+            return new ArrayList<>();
         }
     }
 

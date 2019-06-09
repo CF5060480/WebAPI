@@ -5,17 +5,17 @@ public class EmployeeTakeModule {
     private String mduleId;
     private String employeeId;
     private String batchId;
-    private String scores;
+    private double scores;
     
     
     public EmployeeTakeModule() {
         this.mduleId = "N/A";
         this.employeeId = "N/A";
         this.batchId = "N/A";
-        this.scores = "N/A";
+        this.scores = 0;
     }
 
-    public EmployeeTakeModule(String mduleId, String employeeId, String batchId, String scores) {
+    public EmployeeTakeModule(String mduleId, String employeeId, String batchId, double scores) {
         this.mduleId = mduleId;
         this.employeeId = employeeId;
         this.batchId = batchId;
@@ -46,11 +46,11 @@ public class EmployeeTakeModule {
         this.batchId = batchId;
     }
 
-    public String getScores() {
+    public double getScores() {
         return scores;
     }
 
-    public void setScores(String scores) {
+    public void setScores(double scores) {
         this.scores = scores;
     }
 

@@ -18,21 +18,26 @@ public class EmployeeTakeModulesController {
     @RequestMapping(value = "/getEmployeeTakeModule", method = RequestMethod.POST)
     public String display(@RequestParam Map<String, String> data) throws JSONException {
         EmployeeTakeModulesDAO getEmpTakeModules = new EmployeeTakeModulesDAO();
-        EmployeeTakeModule empTakeModule=getEmpTakeModules.getEmployeeTakeModule(data.get("moduleId"),data.get("employeeId"), data.get("batchId"), data.get("scores"));
-        JSONObject json = new JSONObject();
-        json.put("moduleId", empTakeModule.getMduleId());
-        json.put("employeeId", empTakeModule.getEmployeeId());
-        json.put("batchId", empTakeModule.getBatchId());
-        json.put("scores", empTakeModule.getScores());
-        System.out.println(json.toString());
-        return json.toString();
+       ArrayList<EmployeeTakeModule> empTakeModule=getEmpTakeModules.getEmployeeTakeModule(data.get("batchId"));
+       System.out.println(empTakeModule);
+       JSONArray jList = new JSONArray();
+        for(EmployeeTakeModule e: empTakeModule) {
+            JSONObject jObj = new JSONObject();
+            jObj.put("moduleId", e.getMduleId());
+            jObj.put("employeeId", e.getEmployeeId());
+            jObj.put("batchId", e.getBatchId());
+            jObj.put("scores", e.getScores());
+            jList.put(jObj);
+        }
+        System.out.println(jList.toString());
+        return jList.toString();
     }
 
     @CrossOrigin
     @RequestMapping(value = "/createEmployeeTakeModule", method = RequestMethod.POST)
     public String process(@RequestParam Map<String, String> data) {
         EmployeeTakeModulesDAO createEmpTakeModules = new EmployeeTakeModulesDAO();
-        EmployeeTakeModule empTakeMo = new EmployeeTakeModule(data.get("moduleId"), data.get("employeeId"), data.get("batchId"), data.get("scores"));
+        EmployeeTakeModule empTakeMo = new EmployeeTakeModule(data.get("moduleId"), data.get("employeeId"), data.get("batchId"), Double.parseDouble(data.get("scores")));
         boolean status= createEmpTakeModules.addEmployeeTakeModule(empTakeMo);
         JSONObject jObj = new JSONObject();
         jObj.put("status", status);
@@ -54,7 +59,7 @@ public class EmployeeTakeModulesController {
     @RequestMapping(value = "/updateEmployeeTakeModule", method = RequestMethod.POST)
     public String update(@RequestParam Map<String, String> data) {
         EmployeeTakeModulesDAO updateEmpTakeModules = new EmployeeTakeModulesDAO();
-        EmployeeTakeModule empTakeMo= new EmployeeTakeModule(data.get("moduleId"), data.get("employeeId"),data.get("batchId"),data.get("scores"));
+        EmployeeTakeModule empTakeMo= new EmployeeTakeModule(data.get("moduleId"), data.get("employeeId"),data.get("batchId"),Double.parseDouble(data.get("scores")));
         boolean status = updateEmpTakeModules.updateEmployeeTakeModule(empTakeMo);
         JSONObject jObj = new JSONObject();
         jObj.put("status",status);
