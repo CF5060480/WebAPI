@@ -15,7 +15,6 @@ public class CategoryJDBCOps {
         cs = new ConnectionService();
         con = cs.openConnection();
     }
-
     public Category getCategory(String categoryId) {
         String selectStmt = "SELECT * FROM category WHERE category_id= ?";
         Category category = new Category();

@@ -1,10 +1,14 @@
 package com.atossyntel.connection;
+
 import com.atossyntel.entities.InstructorTeachBatch;
+import com.atossyntel.pooling.ConnectionPooling;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class InstructorTeachBatchJDBCOps {
     private ConnectionService cs;

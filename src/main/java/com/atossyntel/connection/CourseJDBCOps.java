@@ -1,6 +1,5 @@
 package com.atossyntel.connection;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
@@ -16,7 +15,7 @@ public class CourseJDBCOps {
         cs = new ConnectionService();
         con = cs.openConnection();
     }
-
+    
     public Course getCourse(String courseId) {
         String selectStmt = "SELECT * FROM courses WHERE course_id = ?";
         Course course = new Course();

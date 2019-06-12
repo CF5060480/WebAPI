@@ -91,7 +91,7 @@ public class EmployeeTakeModuleJDBCOps {
             st = con.prepareStatement(getAllStmt);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                EmployeeTakeModule empTakeMo = new EmployeeTakeModule(rs.getString("MODULE_ID"), 
+                EmployeeTakeModule empTakeMo = new EmployeeTakeModule(rs.getString("MODULE_ID"),
                         rs.getString("EMPLOYEE_ID"), rs.getString("BATCH_ID"), rs.getInt("SCORES"));
                 empTakeMoList.add(empTakeMo);
             }

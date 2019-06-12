@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ModuleJDBCOps {
     private ConnectionService cs;
@@ -28,7 +30,7 @@ public class ModuleJDBCOps {
                 module = new Module(rs.getString("MODULE_ID"), rs.getString("MODULE_NAME"), rs.getString("CATEGORY_ID"),rs.getString("STREAM_ID"));
             }
         } catch (SQLException ex) {
-            ex.getMessage();
+            System.out.println(ex.getMessage());
         }
         cs.closeConnection(con);
         return module;
@@ -89,7 +91,7 @@ public class ModuleJDBCOps {
             st = con.prepareStatement(getAllStmt);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                Module module = new Module(rs.getString("MODULE_ID"), rs.getString("MODULE_NAME"), rs.getString("CATEGORY_ID"),rs.getString("STREAM_ID"));
+                Module module = new Module(rs.getString("MODULE_ID"), rs.getString("MODULE_NAME"), rs.getString("CATEGORY_ID"), rs.getString("STREAM_ID"));
                 moduleList.add(module);
             }
         } catch (SQLException ex) {

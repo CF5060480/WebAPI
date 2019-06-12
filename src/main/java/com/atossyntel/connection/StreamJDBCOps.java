@@ -1,11 +1,13 @@
 package com.atossyntel.connection;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import com.atossyntel.entities.Stream;
+import com.atossyntel.pooling.ConnectionPooling;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class StreamJDBCOps {
     private ConnectionService cs;

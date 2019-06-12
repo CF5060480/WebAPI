@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
-
 import com.atossyntel.entities.User;
 
 public class UserJDBCOps {
