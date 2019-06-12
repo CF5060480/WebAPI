@@ -1,89 +1,100 @@
 package com.atossyntel.connection;
-
 import com.atossyntel.entities.Employee;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 
-import com.atossyntel.entities.User;
-
 public class EmployeeJDBCOps {
-	private Connection con;
-	private Statement st;
-	
-	public EmployeeJDBCOps() {
-		try {
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-			con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE","Student_Performance","Student_Performance");
-			st = con.createStatement();
-		} catch (SQLException | ClassNotFoundException e) {
-			e.printStackTrace();
-		} 				             
-	}
-	
-	public Employee getEmployee(String empId) {
-		try{
-                System.out.println(empId);
-		ResultSet rs = st.executeQuery("SELECT * FROM employees WHERE employee_id= " +  "'" + empId + "'");
-                Employee emp;
-                while(rs.next()) {
-                    emp = new Employee(rs.getString("EMPLOYEE_ID"), rs.getString("NAME"), rs.getString("EMAIL"));
-                    return emp;
-                }
-		} catch(SQLException ex) {
-			System.out.println(ex.getMessage());
-			return new Employee();
-		}
-                return new Employee();
-	}
-	
-	public boolean addEmployee(Employee emp) {
-		try {
-                        st.executeQuery("INSERT INTO employees VALUES('" + emp.getEmployeeId() + "', '" + emp.getName() + "', '" + emp.getEmail() + "')");
-			return true;
-		} catch(SQLException ex) {
-			System.out.println(ex.getMessage());
-			return false;
-		}
-	}
-	
-	public boolean deleteEmployee(String empId) {
-		try {
-			st.executeQuery("DELETE FROM employees WHERE employee_id='" + empId+"'");
-			return true;
-		}catch(SQLException ex) {
-			System.out.println(ex.getMessage());
-			return false;
-		}
-	}
-	
-	public boolean updateEmployee(Employee emp) {
-		try {
-			st.executeQuery("UPDATE employees SET name='" + emp.getName() + "', email ='" + emp.getEmail() + "' WHERE employee_id = '" + emp.getEmployeeId() + "'");
-			return true;
-		} catch(SQLException ex) {
-			System.out.println(ex.getMessage());
-			return false;
-		}
-	}
-	
-	public ArrayList<Employee> getAllEmployees(){
-		try {
-			ResultSet rs = st.executeQuery("SELECT * FROM employees");
-                        ArrayList<Employee> empList = new ArrayList<>();
-                        System.out.println(rs.toString());
-                        while(rs.next())
-                        {
-                            Employee emp = new Employee(rs.getString("EMPLOYEE_ID"), rs.getString("NAME"), rs.getString("EMAIL"));
-                            empList.add(emp);
-                        }                      
-			return empList;
-		} catch(SQLException ex) {
-			System.out.println(ex.getMessage());
-			return new ArrayList<>();
-		}
-	}
+    private ConnectionService cs;
+    private Connection con;
+    private PreparedStatement st;
+
+    public EmployeeJDBCOps() {
+        cs = new ConnectionService();
+        con = cs.openConnection();
+    }
+
+    public Employee getEmployee(String empId) {
+        String selectStmt = "SELECT * FROM employees WHERE employee_id= ?";
+        Employee employee = new Employee();
+        try {
+            st = con.prepareStatement(selectStmt);
+            st.setString(1, empId);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                employee = new Employee(rs.getString("EMPLOYEE_ID"), rs.getString("NAME"), rs.getString("EMAIL"));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        cs.closeConnection(con);
+        return employee;
+    }
+
+    public boolean addEmployee(Employee emp) {
+        String insertStmt = "INSERT INTO employees VALUES(?, ?, ?)";
+        int retval = 0;
+        try {
+            st = con.prepareStatement(insertStmt);
+            st.setString(1, emp.getEmployeeId());
+            st.setString(2, emp.getName());
+            st.setString(3, emp.getEmail());
+            retval = st.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        cs.closeConnection(con);
+        return (retval != 0);
+    }
+
+    public boolean deleteEmployee(String empId) {
+        String deleteStmt = "DELETE FROM employees WHERE employee_id = ?";
+        int retval = 0;
+        try {
+            st = con.prepareStatement(deleteStmt);
+            st.setString(1, empId);
+            retval = st.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        cs.closeConnection(con);
+        return (retval != 0);
+    }
+
+    public boolean updateEmployee(Employee emp) {
+        String updateStmt = "UPDATE employees SET name = ?, email = ? WHERE employee_id = ?";
+        int retval = 0;
+        try {
+            st = con.prepareStatement(updateStmt);
+            st.setString(1, emp.getName());
+            st.setString(2, emp.getEmail());
+            st.setString(3, emp.getEmployeeId());
+            retval = st.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        cs.closeConnection(con);
+        return (retval != 0);
+    }
+
+    public ArrayList<Employee> getAllEmployees() {
+        String getAllStmt = "SELECT * FROM employees";
+        ArrayList<Employee> employeeList = new ArrayList<>();
+        try {
+            st = con.prepareStatement(getAllStmt);
+            ResultSet rs = st.executeQuery();
+            System.out.println(rs.toString());
+            while (rs.next()) {
+                Employee employee = new Employee(rs.getString("EMPLOYEE_ID"), rs.getString("NAME"), rs.getString("EMAIL"));
+                employeeList.add(employee);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        cs.closeConnection(con);
+        return employeeList;
+    }
 }

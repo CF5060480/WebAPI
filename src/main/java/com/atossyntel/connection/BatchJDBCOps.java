@@ -1,90 +1,108 @@
 package com.atossyntel.connection;
 import com.atossyntel.entities.Batch;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 
 public class BatchJDBCOps {
+    private ConnectionService cs;
     private Connection con;
-    private Statement st;
+    private PreparedStatement st;
 
-    public BatchJDBCOps() {
-        try {
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "Student_Performance", "Student_Performance");
-            st = con.createStatement();
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    public BatchJDBCOps(){
+        cs = new ConnectionService();
+        con = cs.openConnection();
     }
-
+    
     public Batch getBatch(String batchId) {
+        Batch batch = new Batch();
+        String selectStmt = "SELECT * FROM batches WHERE batch_id = ?";
         try {
+            st = con.prepareStatement(selectStmt);
+            st.setString(1, batchId);
             System.out.println(batchId);
-            ResultSet rs = st.executeQuery("SELECT * FROM batches WHERE batch_id = " + "'" + batchId + "'");
-            Batch batch;
+            ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                batch = new Batch(rs.getString("BATCH_ID"), rs.getString("START_DATE"), rs.getString("END_DATE"), rs.getString("STREAM_ID"), rs.getString("COUNTRY"), rs.getString("CITY"));
-                return batch;
+                batch = new Batch(rs.getString("BATCH_ID"), rs.getString("START_DATE"), rs.getString("END_DATE"), 
+                        rs.getString("STREAM_ID"), rs.getString("COUNTRY"), rs.getString("CITY"));
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return new Batch();
         }
-        return new Batch();
+        cs.closeConnection(con);
+        return batch;
     }
 
     public boolean addBatch(Batch batch) {
+        String insertStmt = "INSERT INTO batches VALUES(?, ?, ?, ?, ?, ?)";
+        int retval = 0;
         try {
-            st.executeQuery("INSERT INTO batches VALUES('" + batch.getBatchId() + "', '" 
-                    + batch.getStartDate() + "', '" + batch.getEndDate() + "', '" + batch.getStreamId() 
-                    + "', '" + batch.getCountry() + "', '" + batch.getCity() + "')");
-            return true;
+            st = con.prepareStatement(insertStmt);
+            st.setString(1, batch.getBatchId());
+            st.setString(2, batch.getStartDate());
+            st.setString(3, batch.getEndDate());
+            st.setString(4, batch.getStreamId());
+            st.setString(5, batch.getCountry());
+            st.setString(6, batch.getCity());
+            retval = st.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return false;
         }
+        cs.closeConnection(con);
+        return (retval != 0);
     }
 
     public boolean deleteBatch(String batchId) {
+        String deleteStmt = "DELETE FROM batches WHERE batch_id = ?";
+        int retval = 0;
         try {
-            st.executeQuery("DELETE FROM batches WHERE batch_id='" + batchId + "'");
-            return true;
+            st = con.prepareStatement(deleteStmt);
+            st.setString(1, batchId);
+            retval = st.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return false;
         }
+        cs.closeConnection(con);
+        return (retval != 0);
     }
 
     public boolean updateBatch(Batch batch) {
+        String updateStmt = "UPDATE batches SET start_date = ?, end_date = ?, stream_id = ?, country = ?, city = ? WHERE batch_id = ?";
+        int retval = 0;
         try {
-            st.executeQuery("UPDATE batches SET start_date = '" + batch.getStartDate() + "', end_date = '" 
-                + batch.getEndDate() + "', stream_id = '" + batch.getStreamId() + "', country = '"
-                + batch.getCountry() + "', city = '" + batch.getCity() + "' WHERE batch_id = '" 
-                + batch.getBatchId() + "'");
-            return true;
+            st = con.prepareStatement(updateStmt);
+            st.setString(1, batch.getStartDate());
+            st.setString(2, batch.getEndDate());
+            st.setString(3, batch.getStreamId());
+            st.setString(4, batch.getCountry());
+            st.setString(5, batch.getCity());
+            st.setString(6, batch.getBatchId());
+            retval = st.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return false;
         }
+        cs.closeConnection(con);
+        return (retval != 0);
     }
 
     public ArrayList<Batch> getAllBatches() {
+        ArrayList<Batch> batchList = new ArrayList<>();
+        String getAllStmt = "SELECT * FROM batches";
         try {
-            ResultSet rs = st.executeQuery("SELECT * FROM batches");
-            ArrayList<Batch> batchList = new ArrayList<>();
+            st = con.prepareStatement(getAllStmt);
+            ResultSet rs = st.executeQuery();
             System.out.println(rs.toString());
             while (rs.next()) {
-                Batch batch = new Batch(rs.getString("BATCH_ID"), rs.getString("START_DATE"), rs.getString("END_DATE"), rs.getString("STREAM_ID"), rs.getString("COUNTRY"), rs.getString("CITY"));
+                Batch batch = new Batch(rs.getString("BATCH_ID"), rs.getString("START_DATE"), rs.getString("END_DATE"), 
+                        rs.getString("STREAM_ID"), rs.getString("COUNTRY"), rs.getString("CITY"));
                 batchList.add(batch);
             }
-            return batchList;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return new ArrayList<>();
         }
+        cs.closeConnection(con);
+        return batchList;
     }
 }

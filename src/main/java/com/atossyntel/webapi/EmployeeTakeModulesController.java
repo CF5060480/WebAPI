@@ -49,7 +49,7 @@ public class EmployeeTakeModulesController {
     public String delete(@RequestParam Map<String, String> data) {
         EmployeeTakeModulesDAO deleteEmpTakeModules = new EmployeeTakeModulesDAO();
         boolean status=deleteEmpTakeModules.deleteEmployeeTakeModule(data.get("moduleId"), 
-            data.get("empId"), data.get("batchId"));
+            data.get("employeeId"), data.get("batchId"));
         JSONObject jObj = new JSONObject();
         jObj.put("status", status);
         return jObj.toString();
