@@ -1,4 +1,5 @@
 package com.atossyntel.connection;
+
 import com.atossyntel.entities.InstructorTeachBatch;
 import com.atossyntel.pooling.ConnectionPooling;
 import java.sql.Connection;
@@ -16,17 +17,21 @@ public class InstructorTeachBatchJDBCOps {
 
     public InstructorTeachBatchJDBCOps() {
         try {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
             conPool = ConnectionPooling.create("jdbc:oracle:thin:@localhost:1521:XE", "Student_Performance", "Student_Performance");
+            con = conPool.getConnection();
+            st = con.createStatement();
+            System.out.println("Connection Pool: " + conPool);
 
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
 
     public InstructorTeachBatch getInsTchBat(String userId, String batchId) {
         try {
-            ResultSet rs = st.executeQuery("SELECT * FROM instructors_teach_batches WHERE user_id= " + "'" + userId+"'"
-                                                                                +" AND batch_id= " + "'" + batchId+"'");
+            ResultSet rs = st.executeQuery("SELECT * FROM instructors_teach_batches WHERE user_id= " + "'" + userId + "'"
+                    + " AND batch_id= " + "'" + batchId + "'");
             InstructorTeachBatch insTchBat;
             while (rs.next()) {
                 insTchBat = new InstructorTeachBatch(rs.getString("USER_ID"), rs.getString("BATCH_ID"));
@@ -41,8 +46,8 @@ public class InstructorTeachBatchJDBCOps {
 
     public boolean addInsTchBat(InstructorTeachBatch insTchBat) {
         try {
-            st.executeQuery("INSERT INTO instructors_teach_batches VALUES('" 
-                    + insTchBat.getUserId() + "', '" 
+            st.executeQuery("INSERT INTO instructors_teach_batches VALUES('"
+                    + insTchBat.getUserId() + "', '"
                     + insTchBat.getBatchId() + "')");
             return true;
         } catch (SQLException ex) {
@@ -51,11 +56,11 @@ public class InstructorTeachBatchJDBCOps {
         }
     }
 
-    public boolean deleteInsTchBat(String userId,String batchId) {
+    public boolean deleteInsTchBat(String userId, String batchId) {
         try {
             System.out.println(userId);
             System.out.println(batchId);
-            st.executeQuery("DELETE FROM instructors_teach_batches WHERE USER_ID='" + userId 
+            st.executeQuery("DELETE FROM instructors_teach_batches WHERE USER_ID='" + userId
                     + "' AND BATCH_ID='" + batchId + "'");
             return true;
         } catch (SQLException ex) {

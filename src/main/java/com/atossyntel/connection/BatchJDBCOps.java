@@ -1,4 +1,5 @@
 package com.atossyntel.connection;
+
 import com.atossyntel.entities.Batch;
 import com.atossyntel.pooling.ConnectionPooling;
 import java.sql.Connection;
@@ -9,14 +10,20 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 public class BatchJDBCOps {
+
     private Connection con;
     private Statement st;
     ConnectionPooling conPool;
 
     public BatchJDBCOps() {
         try {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
             conPool = ConnectionPooling.create("jdbc:oracle:thin:@localhost:1521:XE", "Student_Performance", "Student_Performance");
-        } catch (SQLException e) {
+            con = conPool.getConnection();
+            st = con.createStatement();
+            System.out.println("Connection Pool: " + conPool);
+
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
@@ -39,8 +46,8 @@ public class BatchJDBCOps {
 
     public boolean addBatch(Batch batch) {
         try {
-            st.executeQuery("INSERT INTO batches VALUES('" + batch.getBatchId() + "', '" 
-                    + batch.getStartDate() + "', '" + batch.getEndDate() + "', '" + batch.getStreamId() 
+            st.executeQuery("INSERT INTO batches VALUES('" + batch.getBatchId() + "', '"
+                    + batch.getStartDate() + "', '" + batch.getEndDate() + "', '" + batch.getStreamId()
                     + "', '" + batch.getCountry() + "', '" + batch.getCity() + "')");
             return true;
         } catch (SQLException ex) {
@@ -61,10 +68,10 @@ public class BatchJDBCOps {
 
     public boolean updateBatch(Batch batch) {
         try {
-            st.executeQuery("UPDATE batches SET start_date = '" + batch.getStartDate() + "', end_date = '" 
-                + batch.getEndDate() + "', stream_id = '" + batch.getStreamId() + "', country = '"
-                + batch.getCountry() + "', city = '" + batch.getCity() + "' WHERE batch_id = '" 
-                + batch.getBatchId() + "'");
+            st.executeQuery("UPDATE batches SET start_date = '" + batch.getStartDate() + "', end_date = '"
+                    + batch.getEndDate() + "', stream_id = '" + batch.getStreamId() + "', country = '"
+                    + batch.getCountry() + "', city = '" + batch.getCity() + "' WHERE batch_id = '"
+                    + batch.getBatchId() + "'");
             return true;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());

@@ -18,15 +18,20 @@ public class EmployeeTakeModuleJDBCOps {
 
     public EmployeeTakeModuleJDBCOps() {
         try {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
             conPool = ConnectionPooling.create("jdbc:oracle:thin:@localhost:1521:XE", "Student_Performance", "Student_Performance");
-        } catch (SQLException e) {
+            con = conPool.getConnection();
+            st = con.createStatement();
+            System.out.println("Connection Pool: " + conPool);
+
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
 
     public ArrayList<EmployeeTakeModule> getEmployeeTakeModule(String batchId) {
         try {
-            ResultSet rs = st.executeQuery("SELECT * FROM employees_take_modules WHERE batch_id='" + batchId+ "'");
+            ResultSet rs = st.executeQuery("SELECT * FROM employees_take_modules WHERE batch_id='" + batchId + "'");
             ArrayList<EmployeeTakeModule> empTakeMoList = new ArrayList<>();
             while (rs.next()) {
                 EmployeeTakeModule empTakeMo = new EmployeeTakeModule(rs.getString("MODULE_ID"), rs.getString("EMPLOYEE_ID"), rs.getString("BATCH_ID"), rs.getInt("SCORES"));
@@ -41,10 +46,10 @@ public class EmployeeTakeModuleJDBCOps {
 
     public boolean addEmployeeTakeModule(EmployeeTakeModule empTakeMo) {
         try {
-            st.executeQuery("INSERT INTO employees_take_modules VALUES('" 
-                    + empTakeMo.getMduleId() + "', '" 
-                    + empTakeMo.getEmployeeId() + "', '" 
-                    + empTakeMo.getBatchId() + "', '" 
+            st.executeQuery("INSERT INTO employees_take_modules VALUES('"
+                    + empTakeMo.getMduleId() + "', '"
+                    + empTakeMo.getEmployeeId() + "', '"
+                    + empTakeMo.getBatchId() + "', '"
                     + empTakeMo.getScores() + "')");
             return true;
         } catch (SQLException ex) {
@@ -53,10 +58,10 @@ public class EmployeeTakeModuleJDBCOps {
         }
     }
 
-    public boolean deleteEmployeeTakeModule(String moduleId,String empId,String batchId) {
+    public boolean deleteEmployeeTakeModule(String moduleId, String empId, String batchId) {
         try {
             st.executeQuery("DELETE FROM employees_take_modules WHERE "
-                    + "MODULE_ID='" + moduleId+"' AND "
+                    + "MODULE_ID='" + moduleId + "' AND "
                     + "EMPLOYEE_ID='" + empId + "' AND "
                     + "BATCH_ID='" + batchId
                     + "'");
@@ -86,7 +91,7 @@ public class EmployeeTakeModuleJDBCOps {
             ArrayList<EmployeeTakeModule> empTakeMoList = new ArrayList<>();
             System.out.println(rs.toString());
             while (rs.next()) {
-                EmployeeTakeModule empTakeMo = new EmployeeTakeModule(rs.getString("MODULE_ID"), 
+                EmployeeTakeModule empTakeMo = new EmployeeTakeModule(rs.getString("MODULE_ID"),
                         rs.getString("EMPLOYEE_ID"), rs.getString("BATCH_ID"), rs.getInt("SCORES"));
                 empTakeMoList.add(empTakeMo);
             }

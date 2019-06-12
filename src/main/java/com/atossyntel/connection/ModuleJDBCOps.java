@@ -18,9 +18,13 @@ public class ModuleJDBCOps {
 
     public ModuleJDBCOps() {
         try {
-             conPool = ConnectionPooling.create("jdbc:oracle:thin:@localhost:1521:XE", "Student_Performance", "Student_Performance");
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+            conPool = ConnectionPooling.create("jdbc:oracle:thin:@localhost:1521:XE", "Student_Performance", "Student_Performance");
+            con = conPool.getConnection();
+            st = con.createStatement();
+            System.out.println("Connection Pool: " + conPool);
 
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
@@ -31,7 +35,7 @@ public class ModuleJDBCOps {
             ResultSet rs = st.executeQuery("SELECT * FROM modules WHERE MODULE_ID= " + "'" + moduleId + "'");
             Module module;
             while (rs.next()) {
-                module = new Module(rs.getString("MODULE_ID"), rs.getString("MODULE_NAME"), rs.getString("CATEGORY_ID"),rs.getString("STREAM_ID"));
+                module = new Module(rs.getString("MODULE_ID"), rs.getString("MODULE_NAME"), rs.getString("CATEGORY_ID"), rs.getString("STREAM_ID"));
                 return module;
             }
         } catch (SQLException ex) {
@@ -43,8 +47,8 @@ public class ModuleJDBCOps {
 
     public boolean addModule(Module module) {
         try {
-            st.executeQuery("INSERT INTO MODULES VALUES('" + module.getModuleId() + "' , '" 
-                    + module.getModuleName() + "', '" + module.getCategoryId()+ "', '" + module.getStreamId() + "')");
+            st.executeQuery("INSERT INTO MODULES VALUES('" + module.getModuleId() + "' , '"
+                    + module.getModuleName() + "', '" + module.getCategoryId() + "', '" + module.getStreamId() + "')");
             return true;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
@@ -80,7 +84,7 @@ public class ModuleJDBCOps {
             ResultSet rs = st.executeQuery("SELECT * FROM modules");
             ArrayList<Module> moduleList = new ArrayList<>();
             while (rs.next()) {
-                Module module = new Module(rs.getString("MODULE_ID"), rs.getString("MODULE_NAME"), rs.getString("CATEGORY_ID"),rs.getString("STREAM_ID"));
+                Module module = new Module(rs.getString("MODULE_ID"), rs.getString("MODULE_NAME"), rs.getString("CATEGORY_ID"), rs.getString("STREAM_ID"));
                 moduleList.add(module);
             }
             return moduleList;

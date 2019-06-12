@@ -1,4 +1,5 @@
 package com.atossyntel.connection;
+
 import com.atossyntel.entities.Employee;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -10,14 +11,20 @@ import com.atossyntel.entities.Category;
 import com.atossyntel.pooling.ConnectionPooling;
 
 public class CategoryJDBCOps {
+
     private Connection con;
     private Statement st;
     ConnectionPooling conPool;
 
     public CategoryJDBCOps() {
         try {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
             conPool = ConnectionPooling.create("jdbc:oracle:thin:@localhost:1521:XE", "Student_Performance", "Student_Performance");
-        } catch (SQLException e) {
+            con = conPool.getConnection();
+            st = con.createStatement();
+            System.out.println("Connection Pool: " + conPool);
+
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
