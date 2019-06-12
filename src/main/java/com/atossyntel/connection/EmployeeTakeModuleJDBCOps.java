@@ -2,6 +2,7 @@ package com.atossyntel.connection;
 
 import com.atossyntel.entities.Employee;
 import com.atossyntel.entities.EmployeeTakeModule;
+import com.atossyntel.pooling.ConnectionPooling;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -13,13 +14,12 @@ public class EmployeeTakeModuleJDBCOps {
 
     private Connection con;
     private Statement st;
+    private ConnectionPooling conPool;
 
     public EmployeeTakeModuleJDBCOps() {
         try {
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "Student_Performance", "Student_Performance");
-            st = con.createStatement();
-        } catch (SQLException | ClassNotFoundException e) {
+            conPool = ConnectionPooling.create("jdbc:oracle:thin:@localhost:1521:XE", "Student_Performance", "Student_Performance");
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }

@@ -6,17 +6,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import com.atossyntel.entities.Course;
+import com.atossyntel.pooling.ConnectionPooling;
 
 public class CourseJDBCOps {
     private Connection con;
     private Statement st;
+    private ConnectionPooling conPool;
 
     public CourseJDBCOps() {
         try {
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "Student_Performance", "Student_Performance");
-            st = con.createStatement();
-        } catch (SQLException | ClassNotFoundException e) {
+            conPool = ConnectionPooling.create("jdbc:oracle:thin:@localhost:1521:XE", "Student_Performance", "Student_Performance");
+
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
