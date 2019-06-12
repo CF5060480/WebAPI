@@ -29,7 +29,7 @@ public class ModuleJDBCOps {
         }
     }
 
-    public Module getModule(String moduleId) {
+    public Module getModule(String moduleId) throws SQLException {
         try {
             System.out.println(moduleId);
             ResultSet rs = st.executeQuery("SELECT * FROM modules WHERE MODULE_ID= " + "'" + moduleId + "'");
@@ -41,11 +41,13 @@ public class ModuleJDBCOps {
         } catch (SQLException ex) {
             ex.getMessage();
             return new Module();
+        } finally {
+            con.close();
         }
         return new Module();
     }
 
-    public boolean addModule(Module module) {
+    public boolean addModule(Module module) throws SQLException {
         try {
             st.executeQuery("INSERT INTO MODULES VALUES('" + module.getModuleId() + "' , '"
                     + module.getModuleName() + "', '" + module.getCategoryId() + "', '" + module.getStreamId() + "')");
@@ -53,20 +55,24 @@ public class ModuleJDBCOps {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
+        } finally {
+            con.close();
         }
     }
 
-    public boolean deleteModule(String moduleId) {
+    public boolean deleteModule(String moduleId) throws SQLException {
         try {
             st.executeQuery("DELETE FROM MODULES WHERE MODULE_ID='" + moduleId + "'");
             return true;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
+        } finally {
+            con.close();
         }
     }
 
-    public boolean updateModule(Module module) {
+    public boolean updateModule(Module module) throws SQLException {
         try {
             st.executeQuery("UPDATE modules SET MODULE_NAME= '" + module.getModuleName()
                     + "', CATEGORY_ID='" + module.getCategoryId()
@@ -76,10 +82,12 @@ public class ModuleJDBCOps {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
+        } finally {
+            con.close();
         }
     }
 
-    public ArrayList<Module> getAllModules() {
+    public ArrayList<Module> getAllModules() throws SQLException {
         try {
             ResultSet rs = st.executeQuery("SELECT * FROM modules");
             ArrayList<Module> moduleList = new ArrayList<>();
@@ -91,6 +99,8 @@ public class ModuleJDBCOps {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return new ArrayList<>();
+        } finally {
+            con.close();
         }
     }
 }

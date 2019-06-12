@@ -29,7 +29,7 @@ public class CategoryJDBCOps {
         }
     }
 
-    public Category getCategory(String categoryId) {
+    public Category getCategory(String categoryId) throws SQLException {
         try {
             System.out.println(categoryId);
             ResultSet rs = st.executeQuery("SELECT * FROM category WHERE category_id= " + "'" + categoryId + "'");
@@ -41,41 +41,49 @@ public class CategoryJDBCOps {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return new Category();
+        } finally {
+            con.close();
         }
         return new Category();
     }
 
-    public boolean addCategory(Category category) {
+    public boolean addCategory(Category category) throws SQLException {
         try {
             st.executeQuery("INSERT INTO category VALUES('" + category.getCategoryId() + "', '" + category.getCategoryName() + "')");
             return true;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
+        } finally {
+            con.close();
         }
     }
 
-    public boolean deleteCategory(String categoryId) {
+    public boolean deleteCategory(String categoryId) throws SQLException {
         try {
             st.executeQuery("DELETE FROM category WHERE category_id='" + categoryId + "'");
             return true;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
+        } finally {
+            con.close();
         }
     }
 
-    public boolean updateCategory(Category category) {
+    public boolean updateCategory(Category category) throws SQLException {
         try {
             st.executeQuery("UPDATE category SET category_name='" + category.getCategoryName() + "' WHERE category_id = '" + category.getCategoryId() + "'");
             return true;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
+        } finally {
+            con.close();
         }
     }
 
-    public ArrayList<Category> getAllCategories() {
+    public ArrayList<Category> getAllCategories() throws SQLException {
         try {
             ResultSet rs = st.executeQuery("SELECT * FROM category");
             ArrayList<Category> categoryList = new ArrayList<>();
@@ -88,6 +96,8 @@ public class CategoryJDBCOps {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return new ArrayList<>();
+        } finally {
+            con.close();
         }
     }
 }

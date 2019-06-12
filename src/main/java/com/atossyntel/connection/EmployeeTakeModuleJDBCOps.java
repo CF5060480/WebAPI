@@ -29,7 +29,7 @@ public class EmployeeTakeModuleJDBCOps {
         }
     }
 
-    public ArrayList<EmployeeTakeModule> getEmployeeTakeModule(String batchId) {
+    public ArrayList<EmployeeTakeModule> getEmployeeTakeModule(String batchId) throws SQLException {
         try {
             ResultSet rs = st.executeQuery("SELECT * FROM employees_take_modules WHERE batch_id='" + batchId + "'");
             ArrayList<EmployeeTakeModule> empTakeMoList = new ArrayList<>();
@@ -41,10 +41,12 @@ public class EmployeeTakeModuleJDBCOps {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return new ArrayList<>();
+        } finally {
+            con.close();
         }
     }
 
-    public boolean addEmployeeTakeModule(EmployeeTakeModule empTakeMo) {
+    public boolean addEmployeeTakeModule(EmployeeTakeModule empTakeMo) throws SQLException {
         try {
             st.executeQuery("INSERT INTO employees_take_modules VALUES('"
                     + empTakeMo.getMduleId() + "', '"
@@ -55,10 +57,12 @@ public class EmployeeTakeModuleJDBCOps {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
+        } finally {
+            con.close();
         }
     }
 
-    public boolean deleteEmployeeTakeModule(String moduleId, String empId, String batchId) {
+    public boolean deleteEmployeeTakeModule(String moduleId, String empId, String batchId) throws SQLException {
         try {
             st.executeQuery("DELETE FROM employees_take_modules WHERE "
                     + "MODULE_ID='" + moduleId + "' AND "
@@ -69,10 +73,12 @@ public class EmployeeTakeModuleJDBCOps {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
+        } finally {
+            con.close();
         }
     }
 
-    public boolean updateEmployeeTakeModule(EmployeeTakeModule empTakeMo) {
+    public boolean updateEmployeeTakeModule(EmployeeTakeModule empTakeMo) throws SQLException {
         try {
             st.executeQuery("UPDATE employees_take_modules SET "
                     + "SCORES='" + empTakeMo.getScores() + "' WHERE MODULE_ID = '" + empTakeMo.getMduleId()
@@ -82,10 +88,12 @@ public class EmployeeTakeModuleJDBCOps {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
+        } finally {
+            con.close();
         }
     }
 
-    public ArrayList<EmployeeTakeModule> getAllEmployeeTakeModules() {
+    public ArrayList<EmployeeTakeModule> getAllEmployeeTakeModules() throws SQLException {
         try {
             ResultSet rs = st.executeQuery("SELECT * FROM employees_take_modules");
             ArrayList<EmployeeTakeModule> empTakeMoList = new ArrayList<>();
@@ -99,6 +107,8 @@ public class EmployeeTakeModuleJDBCOps {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return new ArrayList<>();
+        } finally {
+            con.close();
         }
     }
 }

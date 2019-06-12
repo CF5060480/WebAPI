@@ -30,7 +30,7 @@ public class EmployeeJDBCOps {
         }
     }
 
-    public Employee getEmployee(String empId) {
+    public Employee getEmployee(String empId) throws SQLException {
         try {
             System.out.println(empId);
             ResultSet rs = st.executeQuery("SELECT * FROM employees WHERE employee_id= " + "'" + empId + "'");
@@ -42,41 +42,49 @@ public class EmployeeJDBCOps {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return new Employee();
-        }
+        } finally {
+        con.close();
+    }
         return new Employee();
     }
 
-    public boolean addEmployee(Employee emp) {
+    public boolean addEmployee(Employee emp) throws SQLException {
         try {
             st.executeQuery("INSERT INTO employees VALUES('" + emp.getEmployeeId() + "', '" + emp.getName() + "', '" + emp.getEmail() + "')");
             return true;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
+        } finally {
+            con.close();
         }
     }
 
-    public boolean deleteEmployee(String empId) {
+    public boolean deleteEmployee(String empId) throws SQLException {
         try {
             st.executeQuery("DELETE FROM employees WHERE employee_id='" + empId + "'");
             return true;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
+        } finally {
+            con.close();
         }
     }
 
-    public boolean updateEmployee(Employee emp) {
+    public boolean updateEmployee(Employee emp) throws SQLException {
         try {
             st.executeQuery("UPDATE employees SET name='" + emp.getName() + "', email ='" + emp.getEmail() + "' WHERE employee_id = '" + emp.getEmployeeId() + "'");
             return true;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
+        } finally {
+            con.close();
         }
     }
 
-    public ArrayList<Employee> getAllEmployees() {
+    public ArrayList<Employee> getAllEmployees() throws SQLException {
         try {
             System.out.println("getting all employees...");
             ResultSet rs = st.executeQuery("SELECT * FROM employees");
@@ -90,6 +98,8 @@ public class EmployeeJDBCOps {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return new ArrayList<>();
+        } finally {
+            con.close();
         }
     }
 }

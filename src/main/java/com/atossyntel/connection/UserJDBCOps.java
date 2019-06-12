@@ -29,7 +29,7 @@ public class UserJDBCOps {
         }
     }
 
-    public User getUser(String userId) {
+    public User getUser(String userId) throws SQLException {
         try {
             System.out.println(userId);
             ResultSet rs = st.executeQuery("SELECT * FROM users WHERE USER_ID= " + "'" + userId + "'");
@@ -41,31 +41,37 @@ public class UserJDBCOps {
         } catch (SQLException ex) {
             ex.getMessage();
             return new User();
+        } finally {
+            con.close();
         }
         return new User();
     }
 
-    public boolean addUser(User user) {
+    public boolean addUser(User user) throws SQLException {
         try {
             st.executeQuery("INSERT INTO USERS VALUES('" + user.getUserId() + "' , '" + user.getPassword() + "', '" + user.getIsAdmin() + "')");
             return true;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
+        } finally {
+            con.close();
         }
     }
 
-    public boolean deleteUser(String userId) {
+    public boolean deleteUser(String userId) throws SQLException {
         try {
             st.executeQuery("DELETE FROM USERS WHERE user_id='" + userId + "'");
             return true;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
+        } finally {
+            con.close();
         }
     }
 
-    public boolean updateUser(User user) {
+    public boolean updateUser(User user) throws SQLException {
         try {
             System.out.println("UPDATE users SET(password= '" + user.getPassword() + "', isadmin='" + user.getIsAdmin() + "') WHERE user_id = '" + user.getUserId() + "'");
             st.executeQuery("UPDATE users SET password= '" + user.getPassword() + "', isadmin='" + user.getIsAdmin() + "' WHERE user_id = '" + user.getUserId() + "'");
@@ -73,10 +79,12 @@ public class UserJDBCOps {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
+        } finally {
+            con.close();
         }
     }
 
-    public ArrayList<User> getAllUsers() {
+    public ArrayList<User> getAllUsers() throws SQLException {
         try {
             ResultSet rs = st.executeQuery("SELECT * FROM users");
             ArrayList<User> userList = new ArrayList<>();
@@ -88,6 +96,8 @@ public class UserJDBCOps {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return new ArrayList<>();
+        } finally {
+            con.close();
         }
     }
 }

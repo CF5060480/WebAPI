@@ -28,7 +28,7 @@ public class CourseJDBCOps {
         }
     }
 
-    public Course getCourse(String courseId) {
+    public Course getCourse(String courseId) throws SQLException {
         try {
             System.out.println(courseId);
             ResultSet rs = st.executeQuery("SELECT * FROM courses WHERE course_id= " + "'" + courseId + "'");
@@ -40,41 +40,49 @@ public class CourseJDBCOps {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return new Course();
+        } finally {
+            con.close();
         }
         return new Course();
     }
 
-    public boolean addCourse(Course course) {
+    public boolean addCourse(Course course) throws SQLException {
         try {
             st.executeQuery("INSERT INTO courses VALUES('" + course.getCourseId() + "', '" + course.getCourseName() + "', '" + course.getModuleId() + "')");
             return true;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
+        } finally {
+            con.close();
         }
     }
 
-    public boolean deleteCourse(String courseId) {
+    public boolean deleteCourse(String courseId) throws SQLException {
         try {
             st.executeQuery("DELETE FROM courses WHERE course_id='" + courseId + "'");
             return true;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
+        } finally {
+            con.close();
         }
     }
 
-    public boolean updateCourse(Course course) {
+    public boolean updateCourse(Course course) throws SQLException {
         try {
             st.executeQuery("UPDATE courses SET course_name='" + course.getCourseName() + "', module_id='" + course.getModuleId() + "' WHERE course_id = '" + course.getCourseId() + "'");
             return true;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
+        } finally {
+            con.close();
         }
     }
 
-    public ArrayList<Course> getAllCourses() {
+    public ArrayList<Course> getAllCourses() throws SQLException {
         try {
             ResultSet rs = st.executeQuery("SELECT * FROM courses");
             ArrayList<Course> courseList = new ArrayList<>();
@@ -87,6 +95,8 @@ public class CourseJDBCOps {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return new ArrayList<>();
+        } finally {
+            con.close();
         }
     }
 }

@@ -28,7 +28,7 @@ public class BatchJDBCOps {
         }
     }
 
-    public Batch getBatch(String batchId) {
+    public Batch getBatch(String batchId) throws SQLException {
         try {
             System.out.println(batchId);
             ResultSet rs = st.executeQuery("SELECT * FROM batches WHERE batch_id = " + "'" + batchId + "'");
@@ -40,11 +40,13 @@ public class BatchJDBCOps {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return new Batch();
+        } finally {
+            con.close();
         }
         return new Batch();
     }
 
-    public boolean addBatch(Batch batch) {
+    public boolean addBatch(Batch batch) throws SQLException {
         try {
             st.executeQuery("INSERT INTO batches VALUES('" + batch.getBatchId() + "', '"
                     + batch.getStartDate() + "', '" + batch.getEndDate() + "', '" + batch.getStreamId()
@@ -53,20 +55,24 @@ public class BatchJDBCOps {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
+        } finally {
+            con.close();
         }
     }
 
-    public boolean deleteBatch(String batchId) {
+    public boolean deleteBatch(String batchId) throws SQLException {
         try {
             st.executeQuery("DELETE FROM batches WHERE batch_id='" + batchId + "'");
             return true;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
+        } finally {
+            con.close();
         }
     }
 
-    public boolean updateBatch(Batch batch) {
+    public boolean updateBatch(Batch batch) throws SQLException {
         try {
             st.executeQuery("UPDATE batches SET start_date = '" + batch.getStartDate() + "', end_date = '"
                     + batch.getEndDate() + "', stream_id = '" + batch.getStreamId() + "', country = '"
@@ -76,10 +82,12 @@ public class BatchJDBCOps {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
+        } finally {
+            con.close();
         }
     }
 
-    public ArrayList<Batch> getAllBatches() {
+    public ArrayList<Batch> getAllBatches() throws SQLException {
         try {
             ResultSet rs = st.executeQuery("SELECT * FROM batches");
             ArrayList<Batch> batchList = new ArrayList<>();
@@ -92,6 +100,8 @@ public class BatchJDBCOps {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return new ArrayList<>();
+        } finally {
+            con.close();
         }
     }
 }
