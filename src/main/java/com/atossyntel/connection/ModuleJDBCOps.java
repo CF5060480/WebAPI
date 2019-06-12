@@ -9,6 +9,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ModuleJDBCOps {
 
@@ -29,7 +31,7 @@ public class ModuleJDBCOps {
         }
     }
 
-    public Module getModule(String moduleId) throws SQLException {
+    public Module getModule(String moduleId) {
         try {
             System.out.println(moduleId);
             ResultSet rs = st.executeQuery("SELECT * FROM modules WHERE MODULE_ID= " + "'" + moduleId + "'");
@@ -42,12 +44,16 @@ public class ModuleJDBCOps {
             ex.getMessage();
             return new Module();
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(ModuleJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return new Module();
     }
 
-    public boolean addModule(Module module) throws SQLException {
+    public boolean addModule(Module module) {
         try {
             st.executeQuery("INSERT INTO MODULES VALUES('" + module.getModuleId() + "' , '"
                     + module.getModuleName() + "', '" + module.getCategoryId() + "', '" + module.getStreamId() + "')");
@@ -56,11 +62,15 @@ public class ModuleJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(ModuleJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public boolean deleteModule(String moduleId) throws SQLException {
+    public boolean deleteModule(String moduleId) {
         try {
             st.executeQuery("DELETE FROM MODULES WHERE MODULE_ID='" + moduleId + "'");
             return true;
@@ -68,11 +78,15 @@ public class ModuleJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(ModuleJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public boolean updateModule(Module module) throws SQLException {
+    public boolean updateModule(Module module) {
         try {
             st.executeQuery("UPDATE modules SET MODULE_NAME= '" + module.getModuleName()
                     + "', CATEGORY_ID='" + module.getCategoryId()
@@ -83,11 +97,15 @@ public class ModuleJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(ModuleJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public ArrayList<Module> getAllModules() throws SQLException {
+    public ArrayList<Module> getAllModules() {
         try {
             ResultSet rs = st.executeQuery("SELECT * FROM modules");
             ArrayList<Module> moduleList = new ArrayList<>();
@@ -100,7 +118,11 @@ public class ModuleJDBCOps {
             System.out.println(ex.getMessage());
             return new ArrayList<>();
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(ModuleJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 }

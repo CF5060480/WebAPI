@@ -9,6 +9,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import com.atossyntel.entities.Stream;
 import com.atossyntel.pooling.ConnectionPooling;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class StreamJDBCOps {
 
@@ -29,7 +31,7 @@ public class StreamJDBCOps {
         }
     }
 
-    public Stream getStream(String id) throws SQLException {
+    public Stream getStream(String id) {
         try {
             System.out.println(id);
             ResultSet rs = st.executeQuery("SELECT * FROM stream WHERE stream_id= " + "'" + id + "'");
@@ -42,12 +44,16 @@ public class StreamJDBCOps {
             System.out.println(ex.getMessage());
             return new Stream();
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(StreamJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return new Stream();
     }
 
-    public boolean addStream(Stream stream) throws SQLException {
+    public boolean addStream(Stream stream) {
         try {
             st.executeQuery("INSERT INTO stream VALUES('" + stream.getStreamId() + "', '" + stream.getStreamName() + "')");
             return true;
@@ -55,11 +61,15 @@ public class StreamJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(StreamJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public boolean deleteStream(String id) throws SQLException {
+    public boolean deleteStream(String id) {
         try {
             st.executeQuery("DELETE FROM stream WHERE stream_id='" + id + "'");
             return true;
@@ -67,11 +77,15 @@ public class StreamJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(StreamJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public boolean updateStream(Stream stream) throws SQLException {
+    public boolean updateStream(Stream stream) {
         try {
             st.executeQuery("UPDATE stream SET stream_name='" + stream.getStreamName() + "' WHERE stream_id = '" + stream.getStreamId() + "'");
             return true;
@@ -79,11 +93,15 @@ public class StreamJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(StreamJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public ArrayList<Stream> getAllStreams() throws SQLException {
+    public ArrayList<Stream> getAllStreams() {
         try {
             ResultSet rs = st.executeQuery("SELECT * FROM stream");
             ArrayList<Stream> streamList = new ArrayList<>();
@@ -97,7 +115,11 @@ public class StreamJDBCOps {
             System.out.println(ex.getMessage());
             return new ArrayList<>();
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(StreamJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 }

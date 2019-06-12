@@ -10,6 +10,8 @@ import java.util.ArrayList;
 
 import com.atossyntel.entities.User;
 import com.atossyntel.pooling.ConnectionPooling;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class EmployeeJDBCOps {
 
@@ -30,7 +32,7 @@ public class EmployeeJDBCOps {
         }
     }
 
-    public Employee getEmployee(String empId) throws SQLException {
+    public Employee getEmployee(String empId) {
         try {
             System.out.println(empId);
             ResultSet rs = st.executeQuery("SELECT * FROM employees WHERE employee_id= " + "'" + empId + "'");
@@ -43,12 +45,16 @@ public class EmployeeJDBCOps {
             System.out.println(ex.getMessage());
             return new Employee();
         } finally {
-        con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(EmployeeJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
     }
         return new Employee();
     }
 
-    public boolean addEmployee(Employee emp) throws SQLException {
+    public boolean addEmployee(Employee emp) {
         try {
             st.executeQuery("INSERT INTO employees VALUES('" + emp.getEmployeeId() + "', '" + emp.getName() + "', '" + emp.getEmail() + "')");
             return true;
@@ -56,11 +62,15 @@ public class EmployeeJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(EmployeeJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public boolean deleteEmployee(String empId) throws SQLException {
+    public boolean deleteEmployee(String empId) {
         try {
             st.executeQuery("DELETE FROM employees WHERE employee_id='" + empId + "'");
             return true;
@@ -68,11 +78,15 @@ public class EmployeeJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(EmployeeJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public boolean updateEmployee(Employee emp) throws SQLException {
+    public boolean updateEmployee(Employee emp) {
         try {
             st.executeQuery("UPDATE employees SET name='" + emp.getName() + "', email ='" + emp.getEmail() + "' WHERE employee_id = '" + emp.getEmployeeId() + "'");
             return true;
@@ -80,11 +94,15 @@ public class EmployeeJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(EmployeeJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public ArrayList<Employee> getAllEmployees() throws SQLException {
+    public ArrayList<Employee> getAllEmployees() {
         try {
             System.out.println("getting all employees...");
             ResultSet rs = st.executeQuery("SELECT * FROM employees");
@@ -99,7 +117,11 @@ public class EmployeeJDBCOps {
             System.out.println(ex.getMessage());
             return new ArrayList<>();
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(EmployeeJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 }

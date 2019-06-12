@@ -8,6 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class InstructorTeachBatchJDBCOps {
 
@@ -46,7 +48,7 @@ public class InstructorTeachBatchJDBCOps {
         return new InstructorTeachBatch();
     }
 
-    public boolean addInsTchBat(InstructorTeachBatch insTchBat) throws SQLException {
+    public boolean addInsTchBat(InstructorTeachBatch insTchBat) {
         try {
             st.executeQuery("INSERT INTO instructors_teach_batches VALUES('"
                     + insTchBat.getUserId() + "', '"
@@ -56,11 +58,15 @@ public class InstructorTeachBatchJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(InstructorTeachBatchJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public boolean deleteInsTchBat(String userId, String batchId) throws SQLException {
+    public boolean deleteInsTchBat(String userId, String batchId) {
         try {
             System.out.println(userId);
             System.out.println(batchId);
@@ -71,11 +77,15 @@ public class InstructorTeachBatchJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(InstructorTeachBatchJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public ArrayList<InstructorTeachBatch> getAllInsTchBat() throws SQLException {
+    public ArrayList<InstructorTeachBatch> getAllInsTchBat() {
         try {
             ResultSet rs = st.executeQuery("SELECT * FROM instructors_teach_batches");
             ArrayList<InstructorTeachBatch> insTchBatList = new ArrayList<>();
@@ -89,7 +99,11 @@ public class InstructorTeachBatchJDBCOps {
             System.out.println(ex.getMessage());
             return new ArrayList<>();
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(InstructorTeachBatchJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 }

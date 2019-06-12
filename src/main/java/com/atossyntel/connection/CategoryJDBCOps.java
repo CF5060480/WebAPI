@@ -9,6 +9,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import com.atossyntel.entities.Category;
 import com.atossyntel.pooling.ConnectionPooling;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CategoryJDBCOps {
 
@@ -29,7 +31,7 @@ public class CategoryJDBCOps {
         }
     }
 
-    public Category getCategory(String categoryId) throws SQLException {
+    public Category getCategory(String categoryId) {
         try {
             System.out.println(categoryId);
             ResultSet rs = st.executeQuery("SELECT * FROM category WHERE category_id= " + "'" + categoryId + "'");
@@ -42,12 +44,16 @@ public class CategoryJDBCOps {
             System.out.println(ex.getMessage());
             return new Category();
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(CategoryJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return new Category();
     }
 
-    public boolean addCategory(Category category) throws SQLException {
+    public boolean addCategory(Category category) {
         try {
             st.executeQuery("INSERT INTO category VALUES('" + category.getCategoryId() + "', '" + category.getCategoryName() + "')");
             return true;
@@ -55,11 +61,15 @@ public class CategoryJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(CategoryJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public boolean deleteCategory(String categoryId) throws SQLException {
+    public boolean deleteCategory(String categoryId) {
         try {
             st.executeQuery("DELETE FROM category WHERE category_id='" + categoryId + "'");
             return true;
@@ -67,11 +77,15 @@ public class CategoryJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(CategoryJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public boolean updateCategory(Category category) throws SQLException {
+    public boolean updateCategory(Category category) {
         try {
             st.executeQuery("UPDATE category SET category_name='" + category.getCategoryName() + "' WHERE category_id = '" + category.getCategoryId() + "'");
             return true;
@@ -79,11 +93,15 @@ public class CategoryJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(CategoryJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public ArrayList<Category> getAllCategories() throws SQLException {
+    public ArrayList<Category> getAllCategories() {
         try {
             ResultSet rs = st.executeQuery("SELECT * FROM category");
             ArrayList<Category> categoryList = new ArrayList<>();
@@ -97,7 +115,11 @@ public class CategoryJDBCOps {
             System.out.println(ex.getMessage());
             return new ArrayList<>();
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(CategoryJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 }

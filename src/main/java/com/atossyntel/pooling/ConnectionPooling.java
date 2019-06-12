@@ -19,7 +19,7 @@ public class ConnectionPooling {
     private String password;
     private List<Connection> connectionPool;
     private List<Connection> usedConnections = new ArrayList<>();
-    private static int INITIAL_POOL_SIZE = 100;
+    private static int INITIAL_POOL_SIZE = 10;
      
     public static ConnectionPooling create(String url, String user, String password) throws SQLException {
   

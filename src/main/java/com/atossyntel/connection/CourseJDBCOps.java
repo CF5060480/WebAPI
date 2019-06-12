@@ -8,6 +8,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import com.atossyntel.entities.Course;
 import com.atossyntel.pooling.ConnectionPooling;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CourseJDBCOps {
 
@@ -28,7 +30,7 @@ public class CourseJDBCOps {
         }
     }
 
-    public Course getCourse(String courseId) throws SQLException {
+    public Course getCourse(String courseId) {
         try {
             System.out.println(courseId);
             ResultSet rs = st.executeQuery("SELECT * FROM courses WHERE course_id= " + "'" + courseId + "'");
@@ -41,12 +43,16 @@ public class CourseJDBCOps {
             System.out.println(ex.getMessage());
             return new Course();
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(CourseJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return new Course();
     }
 
-    public boolean addCourse(Course course) throws SQLException {
+    public boolean addCourse(Course course) {
         try {
             st.executeQuery("INSERT INTO courses VALUES('" + course.getCourseId() + "', '" + course.getCourseName() + "', '" + course.getModuleId() + "')");
             return true;
@@ -54,11 +60,15 @@ public class CourseJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(CourseJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public boolean deleteCourse(String courseId) throws SQLException {
+    public boolean deleteCourse(String courseId) {
         try {
             st.executeQuery("DELETE FROM courses WHERE course_id='" + courseId + "'");
             return true;
@@ -66,11 +76,15 @@ public class CourseJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(CourseJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public boolean updateCourse(Course course) throws SQLException {
+    public boolean updateCourse(Course course) {
         try {
             st.executeQuery("UPDATE courses SET course_name='" + course.getCourseName() + "', module_id='" + course.getModuleId() + "' WHERE course_id = '" + course.getCourseId() + "'");
             return true;
@@ -78,11 +92,15 @@ public class CourseJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(CourseJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public ArrayList<Course> getAllCourses() throws SQLException {
+    public ArrayList<Course> getAllCourses() {
         try {
             ResultSet rs = st.executeQuery("SELECT * FROM courses");
             ArrayList<Course> courseList = new ArrayList<>();
@@ -96,7 +114,11 @@ public class CourseJDBCOps {
             System.out.println(ex.getMessage());
             return new ArrayList<>();
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(CourseJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 }

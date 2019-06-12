@@ -9,6 +9,8 @@ import java.util.ArrayList;
 
 import com.atossyntel.entities.User;
 import com.atossyntel.pooling.ConnectionPooling;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class UserJDBCOps {
 
@@ -29,7 +31,7 @@ public class UserJDBCOps {
         }
     }
 
-    public User getUser(String userId) throws SQLException {
+    public User getUser(String userId) {
         try {
             System.out.println(userId);
             ResultSet rs = st.executeQuery("SELECT * FROM users WHERE USER_ID= " + "'" + userId + "'");
@@ -42,12 +44,16 @@ public class UserJDBCOps {
             ex.getMessage();
             return new User();
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(UserJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return new User();
     }
 
-    public boolean addUser(User user) throws SQLException {
+    public boolean addUser(User user) {
         try {
             st.executeQuery("INSERT INTO USERS VALUES('" + user.getUserId() + "' , '" + user.getPassword() + "', '" + user.getIsAdmin() + "')");
             return true;
@@ -55,11 +61,15 @@ public class UserJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(UserJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public boolean deleteUser(String userId) throws SQLException {
+    public boolean deleteUser(String userId) {
         try {
             st.executeQuery("DELETE FROM USERS WHERE user_id='" + userId + "'");
             return true;
@@ -67,11 +77,15 @@ public class UserJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(UserJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public boolean updateUser(User user) throws SQLException {
+    public boolean updateUser(User user) {
         try {
             System.out.println("UPDATE users SET(password= '" + user.getPassword() + "', isadmin='" + user.getIsAdmin() + "') WHERE user_id = '" + user.getUserId() + "'");
             st.executeQuery("UPDATE users SET password= '" + user.getPassword() + "', isadmin='" + user.getIsAdmin() + "' WHERE user_id = '" + user.getUserId() + "'");
@@ -80,11 +94,15 @@ public class UserJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(UserJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public ArrayList<User> getAllUsers() throws SQLException {
+    public ArrayList<User> getAllUsers() {
         try {
             ResultSet rs = st.executeQuery("SELECT * FROM users");
             ArrayList<User> userList = new ArrayList<>();
@@ -97,7 +115,11 @@ public class UserJDBCOps {
             System.out.println(ex.getMessage());
             return new ArrayList<>();
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(UserJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 }

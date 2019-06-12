@@ -8,6 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class BatchJDBCOps {
 
@@ -28,7 +30,7 @@ public class BatchJDBCOps {
         }
     }
 
-    public Batch getBatch(String batchId) throws SQLException {
+    public Batch getBatch(String batchId) {
         try {
             System.out.println(batchId);
             ResultSet rs = st.executeQuery("SELECT * FROM batches WHERE batch_id = " + "'" + batchId + "'");
@@ -41,12 +43,16 @@ public class BatchJDBCOps {
             System.out.println(ex.getMessage());
             return new Batch();
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(BatchJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return new Batch();
     }
 
-    public boolean addBatch(Batch batch) throws SQLException {
+    public boolean addBatch(Batch batch) {
         try {
             st.executeQuery("INSERT INTO batches VALUES('" + batch.getBatchId() + "', '"
                     + batch.getStartDate() + "', '" + batch.getEndDate() + "', '" + batch.getStreamId()
@@ -56,11 +62,15 @@ public class BatchJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(BatchJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public boolean deleteBatch(String batchId) throws SQLException {
+    public boolean deleteBatch(String batchId) {
         try {
             st.executeQuery("DELETE FROM batches WHERE batch_id='" + batchId + "'");
             return true;
@@ -68,11 +78,15 @@ public class BatchJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(BatchJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public boolean updateBatch(Batch batch) throws SQLException {
+    public boolean updateBatch(Batch batch) {
         try {
             st.executeQuery("UPDATE batches SET start_date = '" + batch.getStartDate() + "', end_date = '"
                     + batch.getEndDate() + "', stream_id = '" + batch.getStreamId() + "', country = '"
@@ -83,11 +97,15 @@ public class BatchJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(BatchJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public ArrayList<Batch> getAllBatches() throws SQLException {
+    public ArrayList<Batch> getAllBatches() {
         try {
             ResultSet rs = st.executeQuery("SELECT * FROM batches");
             ArrayList<Batch> batchList = new ArrayList<>();
@@ -101,7 +119,11 @@ public class BatchJDBCOps {
             System.out.println(ex.getMessage());
             return new ArrayList<>();
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(BatchJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 }

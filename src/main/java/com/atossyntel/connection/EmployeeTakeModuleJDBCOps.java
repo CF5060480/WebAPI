@@ -9,6 +9,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class EmployeeTakeModuleJDBCOps {
 
@@ -29,7 +31,7 @@ public class EmployeeTakeModuleJDBCOps {
         }
     }
 
-    public ArrayList<EmployeeTakeModule> getEmployeeTakeModule(String batchId) throws SQLException {
+    public ArrayList<EmployeeTakeModule> getEmployeeTakeModule(String batchId) {
         try {
             ResultSet rs = st.executeQuery("SELECT * FROM employees_take_modules WHERE batch_id='" + batchId + "'");
             ArrayList<EmployeeTakeModule> empTakeMoList = new ArrayList<>();
@@ -42,11 +44,15 @@ public class EmployeeTakeModuleJDBCOps {
             System.out.println(ex.getMessage());
             return new ArrayList<>();
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(EmployeeTakeModuleJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public boolean addEmployeeTakeModule(EmployeeTakeModule empTakeMo) throws SQLException {
+    public boolean addEmployeeTakeModule(EmployeeTakeModule empTakeMo) {
         try {
             st.executeQuery("INSERT INTO employees_take_modules VALUES('"
                     + empTakeMo.getMduleId() + "', '"
@@ -58,11 +64,15 @@ public class EmployeeTakeModuleJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(EmployeeTakeModuleJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public boolean deleteEmployeeTakeModule(String moduleId, String empId, String batchId) throws SQLException {
+    public boolean deleteEmployeeTakeModule(String moduleId, String empId, String batchId) {
         try {
             st.executeQuery("DELETE FROM employees_take_modules WHERE "
                     + "MODULE_ID='" + moduleId + "' AND "
@@ -74,11 +84,15 @@ public class EmployeeTakeModuleJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(EmployeeTakeModuleJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public boolean updateEmployeeTakeModule(EmployeeTakeModule empTakeMo) throws SQLException {
+    public boolean updateEmployeeTakeModule(EmployeeTakeModule empTakeMo) {
         try {
             st.executeQuery("UPDATE employees_take_modules SET "
                     + "SCORES='" + empTakeMo.getScores() + "' WHERE MODULE_ID = '" + empTakeMo.getMduleId()
@@ -89,11 +103,15 @@ public class EmployeeTakeModuleJDBCOps {
             System.out.println(ex.getMessage());
             return false;
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(EmployeeTakeModuleJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
-    public ArrayList<EmployeeTakeModule> getAllEmployeeTakeModules() throws SQLException {
+    public ArrayList<EmployeeTakeModule> getAllEmployeeTakeModules() {
         try {
             ResultSet rs = st.executeQuery("SELECT * FROM employees_take_modules");
             ArrayList<EmployeeTakeModule> empTakeMoList = new ArrayList<>();
@@ -108,7 +126,11 @@ public class EmployeeTakeModuleJDBCOps {
             System.out.println(ex.getMessage());
             return new ArrayList<>();
         } finally {
-            con.close();
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(EmployeeTakeModuleJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 }
