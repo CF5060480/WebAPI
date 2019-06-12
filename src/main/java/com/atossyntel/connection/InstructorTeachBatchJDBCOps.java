@@ -31,9 +31,8 @@ public class InstructorTeachBatchJDBCOps {
     }
 
     public InstructorTeachBatch getInsTchBat(String userId, String batchId) throws SQLException {
-        try {
-            ResultSet rs = st.executeQuery("SELECT * FROM instructors_teach_batches WHERE user_id= " + "'" + userId + "'"
-                    + " AND batch_id= " + "'" + batchId + "'");
+        try (ResultSet rs = st.executeQuery("SELECT * FROM instructors_teach_batches WHERE user_id= " + "'" + userId + "'"
+                    + " AND batch_id= " + "'" + batchId + "'");) {
             InstructorTeachBatch insTchBat;
             while (rs.next()) {
                 insTchBat = new InstructorTeachBatch(rs.getString("USER_ID"), rs.getString("BATCH_ID"));
@@ -43,22 +42,23 @@ public class InstructorTeachBatchJDBCOps {
             System.out.println(ex.getMessage());
             return new InstructorTeachBatch();
         } finally {
+            conPool.releaseConnection(con);
             con.close();
         }
         return new InstructorTeachBatch();
     }
 
     public boolean addInsTchBat(InstructorTeachBatch insTchBat) {
-        try {
-            st.executeQuery("INSERT INTO instructors_teach_batches VALUES('"
+        try (ResultSet rs = st.executeQuery("INSERT INTO instructors_teach_batches VALUES('"
                     + insTchBat.getUserId() + "', '"
-                    + insTchBat.getBatchId() + "')");
+                    + insTchBat.getBatchId() + "')");){
             return true;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
         } finally {
             try {
+                conPool.releaseConnection(con);
                 con.close();
             } catch (SQLException ex) {
                 Logger.getLogger(InstructorTeachBatchJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
@@ -67,17 +67,16 @@ public class InstructorTeachBatchJDBCOps {
     }
 
     public boolean deleteInsTchBat(String userId, String batchId) {
-        try {
-            System.out.println(userId);
-            System.out.println(batchId);
-            st.executeQuery("DELETE FROM instructors_teach_batches WHERE USER_ID='" + userId
-                    + "' AND BATCH_ID='" + batchId + "'");
+        try (
+            ResultSet rs = st.executeQuery("DELETE FROM instructors_teach_batches WHERE USER_ID='" + userId
+                    + "' AND BATCH_ID='" + batchId + "'");) {
             return true;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             return false;
         } finally {
             try {
+                conPool.releaseConnection(con);
                 con.close();
             } catch (SQLException ex) {
                 Logger.getLogger(InstructorTeachBatchJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
@@ -86,8 +85,8 @@ public class InstructorTeachBatchJDBCOps {
     }
 
     public ArrayList<InstructorTeachBatch> getAllInsTchBat() {
-        try {
-            ResultSet rs = st.executeQuery("SELECT * FROM instructors_teach_batches");
+        try (
+            ResultSet rs = st.executeQuery("SELECT * FROM instructors_teach_batches");) {
             ArrayList<InstructorTeachBatch> insTchBatList = new ArrayList<>();
             System.out.println(rs.toString());
             while (rs.next()) {
@@ -100,6 +99,7 @@ public class InstructorTeachBatchJDBCOps {
             return new ArrayList<>();
         } finally {
             try {
+                conPool.releaseConnection(con);
                 con.close();
             } catch (SQLException ex) {
                 Logger.getLogger(InstructorTeachBatchJDBCOps.class.getName()).log(Level.SEVERE, null, ex);

@@ -46,6 +46,7 @@ public class UserJDBCOps {
         } finally {
             try {
                 con.close();
+                conPool.releaseConnection(con);              
             } catch (SQLException ex) {
                 Logger.getLogger(UserJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
             }
