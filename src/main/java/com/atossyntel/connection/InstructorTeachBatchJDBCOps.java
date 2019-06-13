@@ -2,7 +2,6 @@ package com.atossyntel.connection;
 
 import com.atossyntel.pooling.ConnectionService;
 import com.atossyntel.entities.InstructorTeachBatch;
-import com.atossyntel.pooling.ConnectionPooling;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
