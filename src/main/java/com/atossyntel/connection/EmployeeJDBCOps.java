@@ -1,127 +1,100 @@
 package com.atossyntel.connection;
-
+import com.atossyntel.pooling.ConnectionService;
 import com.atossyntel.entities.Employee;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 
-import com.atossyntel.entities.User;
-import com.atossyntel.pooling.ConnectionPooling;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class EmployeeJDBCOps {
-
+    private ConnectionService cs;
     private Connection con;
-    private Statement st;
-    private ConnectionPooling conPool;
+    private PreparedStatement st;
 
     public EmployeeJDBCOps() {
-        try {
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            conPool = ConnectionPooling.create("jdbc:oracle:thin:@localhost:1521:XE", "Student_Performance", "Student_Performance");
-            con = conPool.getConnection();
-            st = con.createStatement();
-            System.out.println("Connection Pool: " + conPool);
-
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        cs = ConnectionService.getInstance();
+        con = cs.createCon();
     }
 
     public Employee getEmployee(String empId) {
+        String selectStmt = "SELECT * FROM employees WHERE employee_id= ?";
+        Employee employee = new Employee();
         try {
-            System.out.println(empId);
-            ResultSet rs = st.executeQuery("SELECT * FROM employees WHERE employee_id= " + "'" + empId + "'");
-            Employee emp;
+            st = con.prepareStatement(selectStmt);
+            st.setString(1, empId);
+            ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                emp = new Employee(rs.getString("EMPLOYEE_ID"), rs.getString("NAME"), rs.getString("EMAIL"));
-                return emp;
+                employee = new Employee(rs.getString("EMPLOYEE_ID"), rs.getString("NAME"), rs.getString("EMAIL"));
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return new Employee();
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(EmployeeJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
-    }
-        return new Employee();
+        }
+        cs.closeConnection(con);
+        return employee;
     }
 
     public boolean addEmployee(Employee emp) {
+        String insertStmt = "INSERT INTO employees VALUES(?, ?, ?)";
+        int retval = 0;
         try {
-            st.executeQuery("INSERT INTO employees VALUES('" + emp.getEmployeeId() + "', '" + emp.getName() + "', '" + emp.getEmail() + "')");
-            return true;
+            st = con.prepareStatement(insertStmt);
+            st.setString(1, emp.getEmployeeId());
+            st.setString(2, emp.getName());
+            st.setString(3, emp.getEmail());
+            retval = st.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return false;
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(EmployeeJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        cs.closeConnection(con);
+        return (retval != 0);
     }
 
     public boolean deleteEmployee(String empId) {
+        String deleteStmt = "DELETE FROM employees WHERE employee_id = ?";
+        int retval = 0;
         try {
-            st.executeQuery("DELETE FROM employees WHERE employee_id='" + empId + "'");
-            return true;
+            st = con.prepareStatement(deleteStmt);
+            st.setString(1, empId);
+            retval = st.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return false;
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(EmployeeJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        cs.closeConnection(con);
+        return (retval != 0);
     }
 
     public boolean updateEmployee(Employee emp) {
+        String updateStmt = "UPDATE employees SET name = ?, email = ? WHERE employee_id = ?";
+        int retval = 0;
         try {
-            st.executeQuery("UPDATE employees SET name='" + emp.getName() + "', email ='" + emp.getEmail() + "' WHERE employee_id = '" + emp.getEmployeeId() + "'");
-            return true;
+            st = con.prepareStatement(updateStmt);
+            st.setString(1, emp.getName());
+            st.setString(2, emp.getEmail());
+            st.setString(3, emp.getEmployeeId());
+            retval = st.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return false;
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(EmployeeJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        cs.closeConnection(con);
+        return (retval != 0);
     }
 
     public ArrayList<Employee> getAllEmployees() {
+        String getAllStmt = "SELECT * FROM employees";
+        ArrayList<Employee> employeeList = new ArrayList<>();
         try {
-            System.out.println("getting all employees...");
-            ResultSet rs = st.executeQuery("SELECT * FROM employees");
-            ArrayList<Employee> empList = new ArrayList<>();
-            System.out.println("Result Set: " + rs.toString());
+            st = con.prepareStatement(getAllStmt);
+            ResultSet rs = st.executeQuery();
+            System.out.println(rs.toString());
             while (rs.next()) {
-                Employee emp = new Employee(rs.getString("EMPLOYEE_ID"), rs.getString("NAME"), rs.getString("EMAIL"));
-                empList.add(emp);
+                Employee employee = new Employee(rs.getString("EMPLOYEE_ID"), rs.getString("NAME"), rs.getString("EMAIL"));
+                employeeList.add(employee);
             }
-            return empList;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return new ArrayList<>();
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(EmployeeJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        cs.closeConnection(con);
+        return employeeList;
     }
 }

@@ -1,125 +1,97 @@
 package com.atossyntel.connection;
-
-import com.atossyntel.entities.Employee;
+import com.atossyntel.pooling.ConnectionService;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import com.atossyntel.entities.Stream;
-import com.atossyntel.pooling.ConnectionPooling;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class StreamJDBCOps {
-
+    private ConnectionService cs;
     private Connection con;
-    private Statement st;
-    private ConnectionPooling conPool;
+    private PreparedStatement st;
 
     public StreamJDBCOps() {
-        try {
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            conPool = ConnectionPooling.create("jdbc:oracle:thin:@localhost:1521:XE", "Student_Performance", "Student_Performance");
-            con = conPool.getConnection();
-            st = con.createStatement();
-            System.out.println("Connection Pool: " + conPool);
-
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        cs = ConnectionService.getInstance();
+        con = cs.createCon();
     }
 
-    public Stream getStream(String id) {
+    public Stream getStream(String streamId) {
+        String selectStmt = "SELECT * FROM stream WHERE stream_id= ?";
+        Stream stream = new Stream();
         try {
-            System.out.println(id);
-            ResultSet rs = st.executeQuery("SELECT * FROM stream WHERE stream_id= " + "'" + id + "'");
-            Stream stream;
+            st = con.prepareStatement(selectStmt);
+            st.setString(1, streamId);
+            ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 stream = new Stream(rs.getString("STREAM_ID"), rs.getString("STREAM_NAME"));
-                return stream;
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return new Stream();
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(StreamJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
-        return new Stream();
+        cs.closeConnection(con);
+        return stream;
     }
 
     public boolean addStream(Stream stream) {
+        String insertStmt = "INSERT INTO stream VALUES(?, ?)";
+        int retval = 0;
         try {
-            st.executeQuery("INSERT INTO stream VALUES('" + stream.getStreamId() + "', '" + stream.getStreamName() + "')");
-            return true;
+            st = con.prepareStatement(insertStmt);
+            st.setString(1, stream.getStreamId());
+            st.setString(2, stream.getStreamName());
+            retval = st.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return false;
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(StreamJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        cs.closeConnection(con);
+        return (retval != 0);
     }
 
-    public boolean deleteStream(String id) {
+    public boolean deleteStream(String streamId) {
+        String deleteStmt = "DELETE FROM stream WHERE stream_id = ?";
+        int retval = 0;
         try {
-            st.executeQuery("DELETE FROM stream WHERE stream_id='" + id + "'");
-            return true;
+            st = con.prepareStatement(deleteStmt);
+            st.setString(1, streamId);
+            retval = st.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return false;
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(StreamJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        cs.closeConnection(con);
+        return (retval != 0);
     }
 
     public boolean updateStream(Stream stream) {
+        String updateStmt = "UPDATE stream SET stream_name = ? WHERE stream_id = ?";
+        int retval = 0;
         try {
-            st.executeQuery("UPDATE stream SET stream_name='" + stream.getStreamName() + "' WHERE stream_id = '" + stream.getStreamId() + "'");
-            return true;
+            st = con.prepareStatement(updateStmt);
+            st.setString(1, stream.getStreamName());
+            st.setString(2, stream.getStreamId());
+            retval = st.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return false;
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(StreamJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        cs.closeConnection(con);
+        return (retval != 0);
     }
 
     public ArrayList<Stream> getAllStreams() {
+        String getAllStmt = "SELECT * FROM stream";
+        ArrayList<Stream> streamList = new ArrayList<>();
         try {
-            ResultSet rs = st.executeQuery("SELECT * FROM stream");
-            ArrayList<Stream> streamList = new ArrayList<>();
-            System.out.println(rs.toString());
+            st = con.prepareStatement(getAllStmt);
+            ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 Stream stream = new Stream(rs.getString("STREAM_ID"), rs.getString("STREAM_NAME"));
                 streamList.add(stream);
             }
-            return streamList;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return new ArrayList<>();
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(StreamJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        cs.closeConnection(con);
+        return streamList;
     }
 }

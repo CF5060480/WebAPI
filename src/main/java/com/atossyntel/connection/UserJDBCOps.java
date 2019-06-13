@@ -1,126 +1,100 @@
 package com.atossyntel.connection;
-
+import com.atossyntel.pooling.ConnectionService;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
-
 import com.atossyntel.entities.User;
-import com.atossyntel.pooling.ConnectionPooling;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class UserJDBCOps {
-
+    private ConnectionService cs;
     private Connection con;
-    private Statement st;
-    private ConnectionPooling conPool;
+    private PreparedStatement st;
 
     public UserJDBCOps() {
-        try {
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            conPool = ConnectionPooling.create("jdbc:oracle:thin:@localhost:1521:XE", "Student_Performance", "Student_Performance");
-            con = conPool.getConnection();
-            st = con.createStatement();
-            System.out.println("Connection Pool: " + conPool);
-
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        cs = ConnectionService.getInstance();
+        con = cs.createCon();
     }
 
     public User getUser(String userId) {
+        String selectStmt = "SELECT * FROM users WHERE user_id = ?";
+        User user = new User();
         try {
+            st = con.prepareStatement(selectStmt);
+            st.setString(1, userId);
             System.out.println(userId);
-            ResultSet rs = st.executeQuery("SELECT * FROM users WHERE USER_ID= " + "'" + userId + "'");
-            User user;
+            ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 user = new User(rs.getString("USER_ID"), rs.getString("PASSWORD"), rs.getString("ISADMIN"));
-                return user;
             }
         } catch (SQLException ex) {
             ex.getMessage();
-            return new User();
-        } finally {
-            try {
-                con.close();
-                conPool.releaseConnection(con);              
-            } catch (SQLException ex) {
-                Logger.getLogger(UserJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
-        return new User();
+        cs.closeConnection(con);
+        return user;
     }
 
     public boolean addUser(User user) {
+        String insertStmt = "INSERT INTO USERS VALUES(?, ?, ?)";
+        int retval = 0;
         try {
-            st.executeQuery("INSERT INTO USERS VALUES('" + user.getUserId() + "' , '" + user.getPassword() + "', '" + user.getIsAdmin() + "')");
-            return true;
+            st = con.prepareStatement(insertStmt);
+            st.setString(1, user.getUserId());
+            st.setString(2, user.getPassword());
+            st.setString(3, user.getIsAdmin());
+            retval = st.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return false;
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(UserJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        cs.closeConnection(con);
+        return (retval != 0);
     }
 
     public boolean deleteUser(String userId) {
+        String deleteStmt = "DELETE FROM USERS WHERE user_id= ?";
+        int retval = 0;
         try {
-            st.executeQuery("DELETE FROM USERS WHERE user_id='" + userId + "'");
-            return true;
+            st = con.prepareStatement(deleteStmt);
+            st.setString(1, userId);
+            retval = st.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return false;
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(UserJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        cs.closeConnection(con);
+        return (retval != 0);
     }
 
     public boolean updateUser(User user) {
+        String updateStmt = "UPDATE users SET password = ?, isadmin = ? WHERE user_id = ?";
+        int retval = 0;
         try {
-            System.out.println("UPDATE users SET(password= '" + user.getPassword() + "', isadmin='" + user.getIsAdmin() + "') WHERE user_id = '" + user.getUserId() + "'");
-            st.executeQuery("UPDATE users SET password= '" + user.getPassword() + "', isadmin='" + user.getIsAdmin() + "' WHERE user_id = '" + user.getUserId() + "'");
-            return true;
+            st = con.prepareStatement(updateStmt);
+            st.setString(1, user.getPassword());
+            st.setString(2, user.getIsAdmin());
+            st.setString(3, user.getUserId());
+            retval = st.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return false;
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(UserJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        cs.closeConnection(con);
+        return (retval != 0);
     }
 
     public ArrayList<User> getAllUsers() {
+        String getAllStmt = "SELECT * FROM users";
+        ArrayList<User> userList = new ArrayList<>();
         try {
-            ResultSet rs = st.executeQuery("SELECT * FROM users");
-            ArrayList<User> userList = new ArrayList<>();
+            st = con.prepareStatement(getAllStmt);
+            ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 User user = new User(rs.getString("USER_ID"), rs.getString("PASSWORD"), rs.getString("ISADMIN"));
                 userList.add(user);
             }
-            return userList;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return new ArrayList<>();
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(UserJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        cs.closeConnection(con);
+        return userList;
     }
 }

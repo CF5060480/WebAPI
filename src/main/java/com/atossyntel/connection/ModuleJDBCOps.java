@@ -1,128 +1,104 @@
 package com.atossyntel.connection;
-
+import com.atossyntel.pooling.ConnectionService;
 import com.atossyntel.entities.Module;
-import com.atossyntel.entities.User;
-import com.atossyntel.pooling.ConnectionPooling;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ModuleJDBCOps {
-
+    private ConnectionService cs;
     private Connection con;
-    private Statement st;
-    private ConnectionPooling conPool;
+    private PreparedStatement st;
 
     public ModuleJDBCOps() {
-        try {
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            conPool = ConnectionPooling.create("jdbc:oracle:thin:@localhost:1521:XE", "Student_Performance", "Student_Performance");
-            con = conPool.getConnection();
-            st = con.createStatement();
-            System.out.println("Connection Pool: " + conPool);
-
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        cs = ConnectionService.getInstance();
+        con = cs.createCon();
     }
 
     public Module getModule(String moduleId) {
+        String selectStmt = "SELECT * FROM modules WHERE module_id = ?";
+        Module module = new Module();
         try {
+            st = con.prepareStatement(selectStmt);
+            st.setString(1, moduleId);
             System.out.println(moduleId);
-            ResultSet rs = st.executeQuery("SELECT * FROM modules WHERE MODULE_ID= " + "'" + moduleId + "'");
-            Module module;
+            ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                module = new Module(rs.getString("MODULE_ID"), rs.getString("MODULE_NAME"), rs.getString("CATEGORY_ID"), rs.getString("STREAM_ID"));
-                return module;
+                module = new Module(rs.getString("MODULE_ID"), rs.getString("MODULE_NAME"), rs.getString("CATEGORY_ID"),rs.getString("STREAM_ID"));
             }
         } catch (SQLException ex) {
-            ex.getMessage();
-            return new Module();
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(ModuleJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            System.out.println(ex.getMessage());
         }
-        return new Module();
+        cs.closeConnection(con);
+        return module;
     }
 
     public boolean addModule(Module module) {
+        String insertStmt = "INSERT INTO MODULES VALUES(? , ?, ?, ?)";
+        int retval = 0;
         try {
-            st.executeQuery("INSERT INTO MODULES VALUES('" + module.getModuleId() + "' , '"
-                    + module.getModuleName() + "', '" + module.getCategoryId() + "', '" + module.getStreamId() + "')");
-            return true;
+            st = con.prepareStatement(insertStmt);
+            st.setString(1, module.getModuleId());
+            st.setString(2, module.getModuleName());
+            st.setString(3, module.getCategoryId());
+            st.setString(4, module.getStreamId());
+            retval = st.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return false;
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(ModuleJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        cs.closeConnection(con);
+        return (retval != 0);
     }
 
     public boolean deleteModule(String moduleId) {
+        String deleteStmt = "DELETE FROM MODULES WHERE module_id = ?";
+        int retval = 0;
         try {
-            st.executeQuery("DELETE FROM MODULES WHERE MODULE_ID='" + moduleId + "'");
-            return true;
+            st = con.prepareStatement(deleteStmt);
+            st.setString(1, moduleId);
+            retval = st.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return false;
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(ModuleJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        cs.closeConnection(con);
+        return (retval != 0);
     }
 
     public boolean updateModule(Module module) {
+        String updateStmt = "UPDATE modules SET module_name = ?, category_id = ?, stream_id = ? WHERE module_id = ?";
+        int retval = 0;
         try {
-            st.executeQuery("UPDATE modules SET MODULE_NAME= '" + module.getModuleName()
-                    + "', CATEGORY_ID='" + module.getCategoryId()
-                    + "', STREAM_ID='" + module.getStreamId()
-                    + "' WHERE MODULE_ID = '" + module.getModuleId() + "'");
-            return true;
+            st = con.prepareStatement(updateStmt);
+            st.setString(1, module.getModuleName());
+            st.setString(2, module.getCategoryId());
+            st.setString(3, module.getStreamId());
+            st.setString(4, module.getModuleId());
+            retval = st.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return false;
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(ModuleJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        cs.closeConnection(con);
+        return (retval != 0);
     }
 
     public ArrayList<Module> getAllModules() {
+        String getAllStmt = "SELECT * FROM modules";
+        ArrayList<Module> moduleList = new ArrayList<>();
         try {
-            ResultSet rs = st.executeQuery("SELECT * FROM modules");
-            ArrayList<Module> moduleList = new ArrayList<>();
+            st = con.prepareStatement(getAllStmt);
+            ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 Module module = new Module(rs.getString("MODULE_ID"), rs.getString("MODULE_NAME"), rs.getString("CATEGORY_ID"), rs.getString("STREAM_ID"));
                 moduleList.add(module);
             }
-            return moduleList;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return new ArrayList<>();
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(ModuleJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        cs.closeConnection(con);
+        return moduleList;
     }
 }

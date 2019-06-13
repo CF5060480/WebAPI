@@ -1,124 +1,100 @@
 package com.atossyntel.connection;
-
+import com.atossyntel.pooling.ConnectionService;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import com.atossyntel.entities.Course;
-import com.atossyntel.pooling.ConnectionPooling;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class CourseJDBCOps {
-
+    private ConnectionService cs;
     private Connection con;
-    private Statement st;
-    private ConnectionPooling conPool;
+    private PreparedStatement st;
 
     public CourseJDBCOps() {
-        try {
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            conPool = ConnectionPooling.create("jdbc:oracle:thin:@localhost:1521:XE", "Student_Performance", "Student_Performance");
-            con = conPool.getConnection();
-            st = con.createStatement();
-            System.out.println("Connection Pool: " + conPool);
-
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        cs = ConnectionService.getInstance();
+        con = cs.createCon();
     }
-
+    
     public Course getCourse(String courseId) {
+        String selectStmt = "SELECT * FROM courses WHERE course_id = ?";
+        Course course = new Course();
         try {
-            System.out.println(courseId);
-            ResultSet rs = st.executeQuery("SELECT * FROM courses WHERE course_id= " + "'" + courseId + "'");
-            Course course;
+            st = con.prepareStatement(selectStmt);
+            st.setString(1, courseId);
+            ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 course = new Course(rs.getString("COURSE_ID"), rs.getString("COURSE_NAME"), rs.getString("MODULE_ID"));
-                return course;
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return new Course();
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(CourseJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
-        return new Course();
+        cs.closeConnection(con);
+        return course;
     }
 
     public boolean addCourse(Course course) {
+        String insertStmt = "INSERT INTO courses VALUES(?, ?, ?)";
+        int retval = 0;
         try {
-            st.executeQuery("INSERT INTO courses VALUES('" + course.getCourseId() + "', '" + course.getCourseName() + "', '" + course.getModuleId() + "')");
-            return true;
+            st = con.prepareStatement(insertStmt);
+            st.setString(1, course.getCourseId());
+            st.setString(2, course.getCourseName());
+            st.setString(3, course.getModuleId());
+            retval = st.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return false;
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(CourseJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        cs.closeConnection(con);
+        return (retval != 0);
     }
 
     public boolean deleteCourse(String courseId) {
+        String deleteStmt = "DELETE FROM courses WHERE course_id = ?";
+        int retval = 0;
         try {
-            st.executeQuery("DELETE FROM courses WHERE course_id='" + courseId + "'");
-            return true;
+            st = con.prepareStatement(deleteStmt);
+            st.setString(1, courseId);
+            retval = st.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return false;
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(CourseJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        cs.closeConnection(con);
+        return (retval != 0);
     }
 
     public boolean updateCourse(Course course) {
+        String updateStmt = "UPDATE courses SET course_name = ?, module_id = ? WHERE course_id = ?";
+        int retval = 0;
         try {
-            st.executeQuery("UPDATE courses SET course_name='" + course.getCourseName() + "', module_id='" + course.getModuleId() + "' WHERE course_id = '" + course.getCourseId() + "'");
-            return true;
+            st = con.prepareStatement(updateStmt);
+            st.setString(1, course.getCourseName());
+            st.setString(2, course.getModuleId());
+            st.setString(3, course.getCourseId());
+            retval = st.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return false;
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(CourseJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        cs.closeConnection(con);
+        return (retval != 0);
     }
 
     public ArrayList<Course> getAllCourses() {
+        String getAllStmt = "SELECT * FROM courses";
+        ArrayList<Course> courseList = new ArrayList<>();
         try {
-            ResultSet rs = st.executeQuery("SELECT * FROM courses");
-            ArrayList<Course> courseList = new ArrayList<>();
+            st = con.prepareStatement(getAllStmt);
+            ResultSet rs = st.executeQuery();
             System.out.println(rs.toString());
             while (rs.next()) {
                 Course course = new Course(rs.getString("COURSE_ID"), rs.getString("COURSE_NAME"), rs.getString("MODULE_ID"));
                 courseList.add(course);
             }
-            return courseList;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
-            return new ArrayList<>();
-        } finally {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(CourseJDBCOps.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        cs.closeConnection(con);
+        return courseList;
     }
 }

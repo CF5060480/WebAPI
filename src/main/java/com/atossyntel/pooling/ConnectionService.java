@@ -1,33 +1,25 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.atossyntel.pooling;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.commons.dbcp.BasicDataSource;
 
-public class ConnectionPooling {
+public class ConnectionService {
 
-    private static ConnectionPooling instance;
+    private static ConnectionService instance;
     private Connection con;
     private Statement st;
 
-    private ConnectionPooling() {
+    private ConnectionService() {
         //default constructor
     }
 
     static {
-        instance = new ConnectionPooling();
+        instance = new ConnectionService();
     }
 
-    public static ConnectionPooling getInstance() {
+    public static ConnectionService getInstance() {
         return instance;
     }
 
@@ -45,3 +37,4 @@ public class ConnectionPooling {
        try{c.close();}catch(Exception e){}
    }
 }
+
